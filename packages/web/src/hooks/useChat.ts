@@ -12,19 +12,19 @@ import {
   ExtraData,
   Model,
   UpdateFeedbackRequest,
+  ListChatsResponse,
+  AdditionalModelRequestFields,
 } from 'generative-ai-use-cases-jp';
 import { useEffect, useMemo } from 'react';
 import { v4 as uuid } from 'uuid';
 import useChatApi from './useChatApi';
 import useChatList from './useChatList';
-// TODO: SWR 2.2.5 では InifiniteKeyedMutator が export されていない
-// 以下のコミットで対応されている => 2.2.6 が stable になり次第こちらを対応する (それまでは any を許容する)
-// https://github.com/vercel/swr/commit/cb2946ddcafbeedecf724aa19b3929865c026bc7
-// import { InfiniteKeyedMutator } from 'swr/infinite';
-// mutateListChat の本来の型は InfiniteKeyedMutator<ListChatsResponse[]>
+import { SWRInfiniteKeyedMutator } from 'swr/infinite';
 import { getPrompter } from '../prompts';
 import { findModelByModelId } from './useModel';
 import useFileApi from './useFileApi';
+
+type GenerationMode = 'normal' | 'continue' | 'retry';
 
 const useChatState = create<{
   chats: {
@@ -40,6 +40,7 @@ const useChatState = create<{
   loading: {
     [id: string]: boolean;
   };
+  base64Cache: { [key: string]: string };
   getModelId: (id: string) => string;
   setModelId: (id: string, newModelId: string) => void;
   setLoading: (id: string, newLoading: boolean) => void;
@@ -53,23 +54,47 @@ const useChatState = create<{
   post: (
     id: string,
     content: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutateListChat: any, // TODO: ファイル上部コメント参照
+    mutateListChat: SWRInfiniteKeyedMutator<ListChatsResponse[]>,
     ignoreHistory: boolean,
     preProcessInput: ((message: ShownMessage[]) => ShownMessage[]) | undefined,
     postProcessOutput: ((message: string) => string) | undefined,
     sessionId: string | undefined,
-    extraData: UploadedFileType[] | undefined
+    uploadedFiles: UploadedFileType[] | undefined,
+    extraData: ExtraData[] | undefined,
+    overrideModelType: Model['type'] | undefined,
+    setSessionId: (sessionId: string) => void,
+    base64Cache: Record<string, string> | undefined,
+    overrideModelParameters: AdditionalModelRequestFields | undefined
   ) => void;
   continueGeneration: (
+    generationMode: GenerationMode,
     id: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutateListChat: any, // TODO: ファイル上部コメント参照
+    mutateListChat: SWRInfiniteKeyedMutator<ListChatsResponse[]>,
     ignoreHistory: boolean,
     preProcessInput: ((message: ShownMessage[]) => ShownMessage[]) | undefined,
     postProcessOutput: ((message: string) => string) | undefined,
     sessionId: string | undefined,
-    extraData: UploadedFileType[] | undefined
+    uploadedFiles: UploadedFileType[] | undefined,
+    extraData: ExtraData[] | undefined,
+    overrideModelType: Model['type'] | undefined,
+    setSessionId: (sessionId: string) => void,
+    base64Cache: Record<string, string> | undefined,
+    overrideModelParameters: AdditionalModelRequestFields | undefined
+  ) => void;
+  retryGeneration: (
+    generationMode: GenerationMode,
+    id: string,
+    mutateListChat: SWRInfiniteKeyedMutator<ListChatsResponse[]>,
+    ignoreHistory: boolean,
+    preProcessInput: ((message: ShownMessage[]) => ShownMessage[]) | undefined,
+    postProcessOutput: ((message: string) => string) | undefined,
+    sessionId: string | undefined,
+    uploadedFiles: UploadedFileType[] | undefined,
+    extraData: ExtraData[] | undefined,
+    overrideModelType: Model['type'] | undefined,
+    setSessionId: (sessionId: string) => void,
+    base64Cache: Record<string, string> | undefined,
+    overrideModelParameters: AdditionalModelRequestFields | undefined
   ) => void;
   sendFeedback: (
     id: string,
@@ -122,6 +147,7 @@ const useChatState = create<{
             stopReason: '',
           };
         }),
+        base64Cache: {},
       };
     });
   };
@@ -237,12 +263,14 @@ const useChatState = create<{
 
   const formatMessageProperties = (
     messages: ShownMessage[],
-    uploadedFiles?: UploadedFileType[]
+    uploadedFiles?: UploadedFileType[],
+    extraData?: ExtraData[],
+    base64Cache?: Record<string, string>
   ): UnrecordedMessage[] => {
     return messages.map((m) => {
       // LLM で推論する形式に extraData を変換する
-      const extraData: ExtraData[] | undefined = m.extraData?.flatMap(
-        (data) => {
+      const convertedFiles: ExtraData[] | undefined = m.extraData
+        ?.flatMap((data): ExtraData => {
           if (data.type === 'video') {
             // Send S3 location for video
             // https:// 形式の S3 URL から s3:// 形式の S3 URI に変換する
@@ -259,9 +287,13 @@ const useChatState = create<{
           } else {
             // Otherwise (image and file) send base64 encoded data
             // 推論する際は"data:image/png..." のといった情報は必要ないため、削除する
-            const base64EncodedData = uploadedFiles
-              ?.find((uploadedFile) => uploadedFile.s3Url === data.source.data)
-              ?.base64EncodedData?.replace(/^data:(.*,)?/, '');
+            const base64EncodedData =
+              uploadedFiles
+                ?.find(
+                  (uploadedFile) => uploadedFile.s3Url === data.source.data
+                )
+                ?.base64EncodedData?.replace(/^data:(.*,)?/, '') ??
+              base64Cache?.[data.source.data]?.replace(/^data:(.*,)?/, '');
 
             // Base64 エンコードされた画像情報を設定する
             return {
@@ -274,12 +306,18 @@ const useChatState = create<{
               },
             };
           }
-        }
-      );
+        })
+        .filter((data) => {
+          if (!data.source.data) {
+            console.log('File cache not found:', data.name);
+            return false;
+          }
+          return true;
+        });
       return {
         role: m.role,
         content: m.content,
-        extraData: extraData?.filter((data) => data.source.data !== ''),
+        extraData: [...(convertedFiles ?? []), ...(extraData ?? [])],
       };
     });
   };
@@ -335,17 +373,32 @@ const useChatState = create<{
     });
   };
 
+  const getStopReason = (id: string) => {
+    const chat = get().chats[id];
+    if (chat) {
+      return chat.stopReason;
+    }
+    return '';
+  };
+
   const generateMessage = async (
+    generationMode: GenerationMode,
     id: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    mutateListChat: any, // TODO: ファイル上部コメント参照
+    mutateListChat: SWRInfiniteKeyedMutator<ListChatsResponse[]>,
     ignoreHistory: boolean,
     preProcessInput:
       | ((message: ShownMessage[]) => ShownMessage[])
       | undefined = undefined,
     postProcessOutput: ((message: string) => string) | undefined = undefined,
     sessionId: string | undefined = undefined,
-    uploadedFiles: UploadedFileType[] | undefined = undefined
+    uploadedFiles: UploadedFileType[] | undefined = undefined,
+    extraData: ExtraData[] | undefined = undefined,
+    overrideModelType: Model['type'] | undefined = undefined,
+    setSessionId: (sessionId: string) => void = () => {},
+    base64Cache: Record<string, string> | undefined = undefined,
+    overrideModelParameters:
+      | AdditionalModelRequestFields
+      | undefined = undefined
   ) => {
     const modelId = get().modelIds[id];
 
@@ -361,6 +414,14 @@ const useChatState = create<{
       return;
     }
 
+    if (overrideModelType) {
+      model.type = overrideModelType;
+    }
+
+    if (overrideModelParameters) {
+      model.modelParameters = overrideModelParameters;
+    }
+
     // Agent 用の対応
     if (sessionId) {
       model.sessionId = sessionId;
@@ -373,12 +434,10 @@ const useChatState = create<{
 
     const chatMessages = get().chats[id].messages;
 
-    // 最後のアシスタントのメッセージが存在するか確認
-    const isContinue = chatMessages[chatMessages.length - 1].content.length > 0;
     // slice の第二引数
     // - 続きを出力の場合は undefined (最後まで)
     // - そうでない場合は -1 (Assistant のメッセージはカット)
-    const sliceEndIndex = isContinue ? undefined : -1;
+    const sliceEndIndex = generationMode === 'continue' ? undefined : -1;
 
     // 最後のメッセージはアシスタントのメッセージなので、排除
     // ignoreHistory が設定されている場合は最後の会話だけ反映（コスト削減）
@@ -389,7 +448,7 @@ const useChatState = create<{
     // 続きを出力でアシスタントのメッセージが trailing whitespace で終了している場合以下のエラーが出る
     // final assistant content cannot end with trailing whitespace
     // Assistant のメッセージは trimEnd() で末尾の空白を排除
-    if (isContinue) {
+    if (generationMode === 'continue') {
       inputMessages = inputMessages.map((m: UnrecordedMessage, i: number) => {
         if (i === inputMessages.length - 1) {
           return {
@@ -402,6 +461,25 @@ const useChatState = create<{
       });
     }
 
+    // リトライの場合は最後のアシスタントメッセージを空白にする
+    if (generationMode === 'retry') {
+      set((state) => {
+        const newChats = produce(state.chats, (draft) => {
+          const oldAssistantMessage = draft[id].messages.pop()!;
+          const newAssistantMessage: UnrecordedMessage = {
+            ...oldAssistantMessage,
+            content: ' ', // 空文字の場合再レンダーがされないため空白
+            trace: '',
+            extraData: [],
+          };
+          draft[id].messages.push(newAssistantMessage);
+        });
+        return {
+          chats: newChats,
+        };
+      });
+    }
+
     // メッセージの前処理（例：ログからの footnote の削除）
     if (preProcessInput) {
       inputMessages = preProcessInput(inputMessages);
@@ -410,7 +488,9 @@ const useChatState = create<{
     // LLM へのリクエスト
     const formattedMessages = formatMessageProperties(
       inputMessages,
-      uploadedFiles
+      uploadedFiles,
+      extraData,
+      base64Cache
     );
 
     const stream = predictStream({
@@ -440,6 +520,11 @@ const useChatState = create<{
           // Trace
           if (payload.trace) {
             addChunkToAssistantMessage(id, '', payload.trace, model);
+          }
+
+          // SessionId
+          if (payload.sessionId) {
+            setSessionId(payload.sessionId);
           }
         }
       }
@@ -491,8 +576,8 @@ const useChatState = create<{
 
     const toBeRecordedMessages = addMessageIdsToUnrecordedMessages(id);
 
-    // 続きを出力の場合は最後のアシスタントのメッセージを更新する
-    if (isContinue) {
+    // 続きを出力 もしくはリトライの場合は最後のアシスタントのメッセージを更新する
+    if (generationMode === 'continue' || generationMode === 'retry') {
       const lastAssistantMessage: ShownMessage =
         get().chats[id].messages[get().chats[id].messages.length - 1];
       const updatedAssistantMessage: ToBeRecordedMessage = {
@@ -515,6 +600,7 @@ const useChatState = create<{
     chats: {},
     modelIds: {},
     loading: {},
+    base64Cache: {},
     getModelId,
     setModelId,
     setLoading,
@@ -598,21 +684,34 @@ const useChatState = create<{
         | undefined = undefined,
       postProcessOutput: ((message: string) => string) | undefined = undefined,
       sessionId: string | undefined = undefined,
-      uploadedFiles: UploadedFileType[] | undefined = undefined
+      uploadedFiles: UploadedFileType[] | undefined = undefined,
+      extraData: ExtraData[] | undefined = undefined,
+      overrideModelType: Model['type'] | undefined = undefined,
+      setSessionId: (sessionId: string) => void = () => {},
+      base64Cache: Record<string, string> | undefined = undefined,
+      overrideModelParameters:
+        | AdditionalModelRequestFields
+        | undefined = undefined
     ) => {
       const unrecordedUserMessage: UnrecordedMessage = {
         role: 'user',
         content,
         // DDB に保存する形式で、extraData を設定する
-        extraData: uploadedFiles?.map((uploadedFile) => ({
-          type: uploadedFile.type,
-          name: uploadedFile.name,
-          source: {
-            type: 's3',
-            mediaType: uploadedFile.file.type,
-            data: uploadedFile.s3Url ?? '',
-          },
-        })),
+        extraData: [
+          ...(uploadedFiles?.map(
+            (uploadedFile) =>
+              ({
+                type: uploadedFile.type,
+                name: uploadedFile.name,
+                source: {
+                  type: 's3',
+                  mediaType: uploadedFile.file.type,
+                  data: uploadedFile.s3Url ?? '',
+                },
+              }) as ExtraData
+          ) ?? []),
+          ...(extraData ?? []),
+        ],
       };
 
       const unrecordedAssistantMessage: UnrecordedMessage = {
@@ -633,17 +732,24 @@ const useChatState = create<{
       });
 
       await generateMessage(
+        'normal',
         id,
         mutateListChat,
         ignoreHistory,
         preProcessInput,
         postProcessOutput,
         sessionId,
-        uploadedFiles
+        uploadedFiles,
+        extraData,
+        overrideModelType,
+        setSessionId,
+        base64Cache,
+        overrideModelParameters
       );
     },
 
     continueGeneration: generateMessage,
+    retryGeneration: generateMessage,
     sendFeedback: async (id: string, feedbackData: UpdateFeedbackRequest) => {
       const chat = get().chats[id].chat;
 
@@ -653,15 +759,7 @@ const useChatState = create<{
       }
     },
 
-    getStopReason: (id: string) => {
-      const chat = get().chats[id];
-
-      if (chat) {
-        return chat.stopReason;
-      }
-
-      return '';
-    },
+    getStopReason: getStopReason,
   };
 });
 
@@ -684,6 +782,7 @@ const useChat = (id: string, chatId?: string) => {
     restore,
     post,
     continueGeneration,
+    retryGeneration,
     sendFeedback,
     updateSystemContext,
     getCurrentSystemContext,
@@ -759,7 +858,14 @@ const useChat = (id: string, chatId?: string) => {
         | undefined = undefined,
       postProcessOutput: ((message: string) => string) | undefined = undefined,
       sessionId: string | undefined = undefined,
-      extraData: UploadedFileType[] | undefined = undefined
+      uploadedFiles: UploadedFileType[] | undefined = undefined,
+      extraData: ExtraData[] | undefined = undefined,
+      overrideModelType: Model['type'] | undefined = undefined,
+      setSessionId: (sessionId: string) => void = () => {},
+      base64Cache: Record<string, string> | undefined = undefined,
+      overrideModelParameters:
+        | AdditionalModelRequestFields
+        | undefined = undefined
     ) => {
       post(
         id,
@@ -769,7 +875,12 @@ const useChat = (id: string, chatId?: string) => {
         preProcessInput,
         postProcessOutput,
         sessionId,
-        extraData
+        uploadedFiles,
+        extraData,
+        overrideModelType,
+        setSessionId,
+        base64Cache,
+        overrideModelParameters
       );
     },
     continueGeneration: (
@@ -779,16 +890,61 @@ const useChat = (id: string, chatId?: string) => {
         | undefined = undefined,
       postProcessOutput: ((message: string) => string) | undefined = undefined,
       sessionId: string | undefined = undefined,
-      extraData: UploadedFileType[] | undefined = undefined
+      uploadedFiles: UploadedFileType[] | undefined = undefined,
+      extraData: ExtraData[] | undefined = undefined,
+      overrideModelType: Model['type'] | undefined = undefined,
+      setSessionId: (sessionId: string) => void = () => {},
+      base64Cache: Record<string, string> | undefined = undefined,
+      overrideModelParameters:
+        | AdditionalModelRequestFields
+        | undefined = undefined
     ) => {
       continueGeneration(
+        'continue',
         id,
         mutateChatList,
         ignoreHistory,
         preProcessInput,
         postProcessOutput,
         sessionId,
-        extraData
+        uploadedFiles,
+        extraData,
+        overrideModelType,
+        setSessionId,
+        base64Cache,
+        overrideModelParameters
+      );
+    },
+    retryGeneration: (
+      ignoreHistory: boolean = false,
+      preProcessInput:
+        | ((message: ShownMessage[]) => ShownMessage[])
+        | undefined = undefined,
+      postProcessOutput: ((message: string) => string) | undefined = undefined,
+      sessionId: string | undefined = undefined,
+      uploadedFiles: UploadedFileType[] | undefined = undefined,
+      extraData: ExtraData[] | undefined = undefined,
+      overrideModelType: Model['type'] | undefined = undefined,
+      setSessionId: (sessionId: string) => void = () => {},
+      base64Cache: Record<string, string> | undefined = undefined,
+      overrideModelParameters:
+        | AdditionalModelRequestFields
+        | undefined = undefined
+    ) => {
+      retryGeneration(
+        'retry',
+        id,
+        mutateChatList,
+        ignoreHistory,
+        preProcessInput,
+        postProcessOutput,
+        sessionId,
+        uploadedFiles,
+        extraData,
+        overrideModelType,
+        setSessionId,
+        base64Cache,
+        overrideModelParameters
       );
     },
     sendFeedback: async (feedbackData: UpdateFeedbackRequest) => {

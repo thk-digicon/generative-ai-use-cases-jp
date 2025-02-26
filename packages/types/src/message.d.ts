@@ -1,10 +1,12 @@
 import { PrimaryKey } from './base';
+import { AdditionalModelRequestFields } from './text';
 
 export type Role = 'system' | 'user' | 'assistant';
 
 export type Model = {
-  type: 'bedrock' | 'bedrockAgent' | 'sagemaker';
+  type: 'bedrock' | 'bedrockAgent' | 'bedrockKb' | 'sagemaker';
   modelId: string;
+  modelParameters?: AdditionalModelRequestFields;
   sessionId?: string;
 };
 
@@ -16,7 +18,7 @@ export type Agent = {
 
 export type AgentMap = Record<string, { agentId: string; aliasId: string }>;
 
-export type PromptFlow = {
+export type Flow = {
   flowId: string;
   aliasId: string;
   flowName: string;
@@ -41,19 +43,20 @@ export type UnrecordedMessage = {
 };
 
 export type ExtraData = {
-  type: string; // 'image' | 'file'
+  type: 'image' | 'video' | 'file' | 'json';
   name: string;
   source: {
-    type: string; // 'S3' | 'base64'
-    mediaType: string; // mime type (i.e. image/png)
-    data: string; // s3 location for s3, data for base64
+    type: 's3' | 'base64' | 'json';
+    mediaType: string; // mime type (i.e. image/png, text/plain, application/pdf, application/json)
+    data: string; // s3 location for s3, data for base64, json for json
   };
 };
 
 export type UploadedFileType = {
+  id: string;
   file: File;
   name: string;
-  type: string; // 'image' | 'file'
+  type: 'image' | 'video' | 'file';
   base64EncodedData?: string;
   s3Url?: string;
   uploading: boolean;

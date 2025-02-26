@@ -14,11 +14,9 @@ import ChatPage from './pages/ChatPage';
 import SharedChatPage from './pages/SharedChatPage';
 import SummarizePage from './pages/SummarizePage';
 import GenerateTextPage from './pages/GenerateTextPage';
-import EditorialPage from './pages/EditorialPage';
 import TranslatePage from './pages/TranslatePage';
 import VideoAnalyzerPage from './pages/VideoAnalyzerPage';
 import NotFound from './pages/NotFound';
-import KendraSearchPage from './pages/KendraSearchPage';
 import RagPage from './pages/RagPage';
 import RagKnowledgeBasePage from './pages/RagKnowledgeBasePage';
 import WebContent from './pages/WebContent';
@@ -26,7 +24,7 @@ import GenerateImagePage from './pages/GenerateImagePage';
 import OptimizePromptPage from './pages/OptimizePromptPage';
 import TranscribePage from './pages/TranscribePage';
 import AgentChatPage from './pages/AgentChatPage.tsx';
-import PromptFlowChatPage from './pages/PromptFlowChatPage';
+import FlowChatPage from './pages/FlowChatPage';
 import { MODELS } from './hooks/useModel';
 import { Authenticator } from '@aws-amplify/ui-react';
 import UseCaseBuilderEditPage from './pages/useCaseBuilder/UseCaseBuilderEditPage.tsx';
@@ -36,6 +34,10 @@ import UseCaseBuilderExecutePage from './pages/useCaseBuilder/UseCaseBuilderExec
 import UseCaseBuilderSamplesPage from './pages/useCaseBuilder/UseCaseBuilderSamplesPage.tsx';
 import UseCaseBuilderMyUseCasePage from './pages/useCaseBuilder/UseCaseBuilderMyUseCasePage.tsx';
 import { optimizePromptEnabled } from './hooks/useOptimizePrompt';
+import GenerateDiagramPage from './pages/GenerateDiagramPage.tsx';
+import WriterPage from './pages/WriterPage.tsx';
+import useUseCases from './hooks/useUseCases';
+import { Toaster } from 'sonner';
 
 const ragEnabled: boolean = import.meta.env.VITE_APP_RAG_ENABLED === 'true';
 const ragKnowledgeBaseEnabled: boolean =
@@ -43,9 +45,12 @@ const ragKnowledgeBaseEnabled: boolean =
 const samlAuthEnabled: boolean =
   import.meta.env.VITE_APP_SAMLAUTH_ENABLED === 'true';
 const agentEnabled: boolean = import.meta.env.VITE_APP_AGENT_ENABLED === 'true';
+const inlineAgents: boolean = import.meta.env.VITE_APP_INLINE_AGENTS === 'true';
 const { visionEnabled } = MODELS;
 const useCaseBuilderEnabled: boolean =
   import.meta.env.VITE_APP_USE_CASE_BUILDER_ENABLED === 'true';
+// eslint-disable-next-line  react-hooks/rules-of-hooks
+const { enabled } = useUseCases();
 
 const routes: RouteObject[] = [
   {
@@ -68,30 +73,48 @@ const routes: RouteObject[] = [
     path: '/share/:shareId',
     element: <SharedChatPage />,
   },
-  {
-    path: '/generate',
-    element: <GenerateTextPage />,
-  },
-  {
-    path: '/summarize',
-    element: <SummarizePage />,
-  },
-  {
-    path: '/editorial',
-    element: <EditorialPage />,
-  },
-  {
-    path: '/translate',
-    element: <TranslatePage />,
-  },
-  {
-    path: '/web-content',
-    element: <WebContent />,
-  },
-  {
-    path: '/image',
-    element: <GenerateImagePage />,
-  },
+  enabled('generate')
+    ? {
+        path: '/generate',
+        element: <GenerateTextPage />,
+      }
+    : null,
+  enabled('summarize')
+    ? {
+        path: '/summarize',
+        element: <SummarizePage />,
+      }
+    : null,
+  enabled('writer')
+    ? {
+        path: '/writer',
+        element: <WriterPage />,
+      }
+    : null,
+  enabled('translate')
+    ? {
+        path: '/translate',
+        element: <TranslatePage />,
+      }
+    : null,
+  enabled('webContent')
+    ? {
+        path: '/web-content',
+        element: <WebContent />,
+      }
+    : null,
+  enabled('image')
+    ? {
+        path: '/image',
+        element: <GenerateImagePage />,
+      }
+    : null,
+  enabled('diagram')
+    ? {
+        path: '/diagram',
+        element: <GenerateDiagramPage />,
+      }
+    : null,
   optimizePromptEnabled
     ? {
         path: '/optimize',
@@ -103,10 +126,10 @@ const routes: RouteObject[] = [
     element: <TranscribePage />,
   },
   {
-    path: '/prompt-flow-chat',
-    element: <PromptFlowChatPage />,
+    path: '/flow-chat',
+    element: <FlowChatPage />,
   },
-  visionEnabled
+  visionEnabled && enabled('video')
     ? {
         path: '/video',
         element: <VideoAnalyzerPage />,
@@ -124,15 +147,15 @@ const routes: RouteObject[] = [
         element: <RagKnowledgeBasePage />,
       }
     : null,
-  ragEnabled
-    ? {
-        path: '/kendra',
-        element: <KendraSearchPage />,
-      }
-    : null,
-  agentEnabled
+  agentEnabled && !inlineAgents
     ? {
         path: '/agent',
+        element: <AgentChatPage />,
+      }
+    : null,
+  agentEnabled && inlineAgents
+    ? {
+        path: '/agent/:agentName',
         element: <AgentChatPage />,
       }
     : null,
@@ -142,30 +165,29 @@ const routes: RouteObject[] = [
   },
 ].flatMap((r) => (r !== null ? [r] : []));
 
-export const ROUTE_INDEX_USE_CASE_BUILDER = '/use-case-builder';
 const useCaseBuilderRoutes: RouteObject[] = [
   {
-    path: ROUTE_INDEX_USE_CASE_BUILDER,
+    path: '/use-case-builder',
     element: <UseCaseBuilderSamplesPage />,
   },
   {
-    path: `${ROUTE_INDEX_USE_CASE_BUILDER}/my-use-case`,
+    path: `/use-case-builder/my-use-case`,
     element: <UseCaseBuilderMyUseCasePage />,
   },
   {
-    path: `${ROUTE_INDEX_USE_CASE_BUILDER}/new`,
+    path: `/use-case-builder/new`,
     element: <UseCaseBuilderEditPage />,
   },
   {
-    path: `${ROUTE_INDEX_USE_CASE_BUILDER}/edit/:useCaseId`,
+    path: `/use-case-builder/edit/:useCaseId`,
     element: <UseCaseBuilderEditPage />,
   },
   {
-    path: `${ROUTE_INDEX_USE_CASE_BUILDER}/execute/:useCaseId`,
+    path: `/use-case-builder/execute/:useCaseId`,
     element: <UseCaseBuilderExecutePage />,
   },
   {
-    path: `${ROUTE_INDEX_USE_CASE_BUILDER}/setting`,
+    path: `/use-case-builder/setting`,
     element: <Setting />,
   },
   {
@@ -191,7 +213,7 @@ const router = createBrowserRouter([
   ...(useCaseBuilderEnabled
     ? [
         {
-          path: ROUTE_INDEX_USE_CASE_BUILDER,
+          path: '/use-case-builder',
           element: samlAuthEnabled ? (
             <AuthWithSAML>
               <UseCaseBuilderRoot />
@@ -211,6 +233,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Authenticator.Provider>
       <RouterProvider router={router} />
+      <Toaster />
     </Authenticator.Provider>
   </React.StrictMode>
 );

@@ -24,7 +24,12 @@ import { MODELS } from '../hooks/useModel';
 import { getPrompter } from '../prompts';
 import queryString from 'query-string';
 import useFiles from '../hooks/useFiles';
-import { FileLimit, SystemContext } from 'generative-ai-use-cases-jp';
+import {
+  AdditionalModelRequestFields,
+  FileLimit,
+  SystemContext,
+} from 'generative-ai-use-cases-jp';
+import ModelParameters from '../components/ModelParameters';
 
 const fileLimit: FileLimit = {
   accept: {
@@ -102,8 +107,13 @@ const ChatPage: React.FC = () => {
     setSaveSystemContext,
     setSaveSystemContextTitle,
   } = useChatPageState();
-  const { clear: clearFiles, uploadedFiles, uploadFiles } = useFiles();
   const { pathname, search } = useLocation();
+  const {
+    clear: clearFiles,
+    uploadedFiles,
+    uploadFiles,
+    base64Cache,
+  } = useFiles(pathname);
   const { chatId } = useParams();
 
   const { listSystemContexts, deleteSystemContext, updateSystemContextTitle } =
@@ -129,6 +139,7 @@ const ChatPage: React.FC = () => {
     updateSystemContext,
     updateSystemContextByModel,
     getCurrentSystemContext,
+    retryGeneration,
   } = useChat(pathname, chatId);
   const { createShareId, findShareId, deleteShareId } = useChatApi();
   const { createSystemContext } = useSystemContextApi();
@@ -140,6 +151,10 @@ const ChatPage: React.FC = () => {
   const prompter = useMemo(() => {
     return getPrompter(modelId);
   }, [modelId]);
+  const [overrideModelParameters, setOverrideModelParameters] = useState<
+    AdditionalModelRequestFields | undefined
+  >(undefined);
+  const [showSetting, setShowSetting] = useState(false);
 
   useEffect(() => {
     // 会話履歴のページではモデルを変更してもシステムプロンプトを変更しない
@@ -169,6 +184,9 @@ const ChatPage: React.FC = () => {
   const fileUpload = useMemo(() => {
     return accept.length > 0;
   }, [accept]);
+  const setting = useMemo(() => {
+    return MODELS.modelFeatureFlags[modelId]?.reasoning ?? false;
+  }, [modelId]);
 
   useEffect(() => {
     const _modelId = !modelId ? availableModels[0] : modelId;
@@ -201,18 +219,37 @@ const ChatPage: React.FC = () => {
       undefined,
       undefined,
       undefined,
-      fileUpload ? uploadedFiles : undefined
+      fileUpload ? uploadedFiles : undefined,
+      undefined,
+      undefined,
+      undefined,
+      base64Cache,
+      overrideModelParameters
     );
     setContent('');
     clearFiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [content, uploadedFiles, fileUpload, setFollowing]);
+  }, [content, base64Cache, fileUpload, setFollowing, overrideModelParameters]);
+
+  const onRetry = useCallback(() => {
+    retryGeneration(
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      base64Cache,
+      overrideModelParameters
+    );
+  }, [retryGeneration, base64Cache, overrideModelParameters]);
 
   const onReset = useCallback(() => {
     clear();
     setContent('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clear]);
+  }, [clear, setContent]);
 
   const [creatingShareId, setCreatingShareId] = useState(false);
   const [deletingShareId, setDeletingShareId] = useState(false);
@@ -385,7 +422,7 @@ const ChatPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mt-2 flex w-full items-end justify-center lg:mt-0">
+        <div className="mt-2 flex w-full items-end justify-center lg:mt-0 print:hidden">
           <Select
             value={modelId}
             onChange={setModelId}
@@ -406,7 +443,7 @@ const ChatPage: React.FC = () => {
         )}
 
         {!isEmpty && !loadingMessages && (
-          <div className="my-2 flex flex-col items-end pr-3">
+          <div className="my-2 flex flex-col items-end pr-3 print:hidden">
             {chatId && (
               <div>
                 <button
@@ -439,6 +476,8 @@ const ChatPage: React.FC = () => {
                   loading={loading && idx === showingMessages.length - 1}
                   setSaveSystemContext={setSaveSystemContext}
                   setShowSystemContextModal={setShowSystemContextModal}
+                  allowRetry={idx === showingMessages.length - 1}
+                  retryGeneration={onRetry}
                 />
                 <div className="w-full border-b border-gray-300"></div>
               </div>
@@ -504,6 +543,10 @@ const ChatPage: React.FC = () => {
             fileUpload={fileUpload}
             fileLimit={fileLimit}
             accept={accept}
+            setting={setting}
+            onSetting={() => {
+              setShowSetting(true);
+            }}
           />
         </div>
       </div>
@@ -572,6 +615,35 @@ const ChatPage: React.FC = () => {
               リンクの作成
             </Button>
           )}
+        </div>
+      </ModalDialog>
+      <ModalDialog
+        isOpen={showSetting}
+        onClose={() => {
+          setShowSetting(false);
+        }}
+        title="高度なオプション">
+        {setting && (
+          <ExpandableField
+            label="モデルパラメータ"
+            className="relative w-full"
+            defaultOpened={true}>
+            <div className="">
+              <ModelParameters
+                modelFeatureFlags={MODELS.modelFeatureFlags[modelId]}
+                overrideModelParameters={overrideModelParameters}
+                setOverrideModelParameters={setOverrideModelParameters}
+              />
+            </div>
+          </ExpandableField>
+        )}
+        <div className="mt-4 flex justify-end">
+          <Button
+            onClick={() => {
+              setShowSetting(false);
+            }}>
+            設定
+          </Button>
         </div>
       </ModalDialog>
     </>

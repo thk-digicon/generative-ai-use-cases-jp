@@ -1,6 +1,6 @@
 import {
   ChatParams,
-  EditorialParams,
+  WriterParams,
   GenerateTextParams,
   Prompter,
   PromptList,
@@ -10,13 +10,35 @@ import {
   TranslateParams,
   VideoAnalyzerParams,
   WebContentParams,
+  DiagramParams,
 } from './index';
+
+import {
+  FlowchartPrompt,
+  SequencePrompt,
+  ClassPrompt,
+  StatePrompt,
+  ErPrompt,
+  UserJourneyPrompt,
+  GanttChartPrompt,
+  PiechartPrompt,
+  QuadrantchartPrompt,
+  RequirementPrompt,
+  GitgraphPrompt,
+  MindmapPrompt,
+  XychartPrompt,
+  SankeychartPrompt,
+  BlockPrompt,
+  NetworkpacketPrompt,
+  ArchitecturePrompt,
+  TimelinePrompt,
+} from './diagrams/index';
 
 const systemContexts: { [key: string]: string } = {
   '/chat': 'あなたはチャットでユーザを支援するAIアシスタントです。',
   '/summarize':
     'あなたは文章を要約するAIアシスタントです。最初のチャットで要約の指示を出すので、その後のチャットで要約結果の改善を行なってください。',
-  '/editorial':
+  '/writer':
     '以下は文章を校正したいユーザーと、ユーザーの意図と文章を理解して、適切に修正すべき箇所を指摘する校正 AI のやりとりです。ユーザーは <input> タグで校正してほしい文章を与えます。また、<その他指摘してほしいこと> タグで指摘時に追加で指摘したい箇所を与えます。AI は文章について問題がある部分だけを指摘してください。ただし、出力は <output-format></output-format> 形式の JSON Array だけを <output></output> タグで囲って出力してください。<output-format>[{excerpt: string; replace?: string; comment?: string}]</output-format>指摘事項がない場合は空配列を出力してください。',
   '/generate': 'あなたは指示に従って文章を作成するライターです。',
   '/translate':
@@ -104,7 +126,7 @@ ${params.context}
 出力は要約内容を <output></output> の xml タグで囲って出力してください。例外はありません。
 `;
   },
-  editorialPrompt(params: EditorialParams): string {
+  writerPrompt(params: WriterParams): string {
     return `<input>${params.sentence}</input>
 ${
   params.context
@@ -724,4 +746,72 @@ XXX
       },
     ];
   },
+  diagramPrompt(params: DiagramParams): string {
+    if (params.determineType)
+      return `<instruction>
+あなたは図の種類を決定する専門家です。以下の手順に従って、与えられた<content></content>タグ内の情報を分析し、最適な図の種類を選択してください。
+重要: ユーザーが特定の図を作成したいようであればそれを選択してください。これは絶対です。日本語で特定の図を指定されるので、その場合はその特定の図の日本語を英語にして考えてください。
+出力は必ず<Choice>リストから選択した図の種類を完全に一致する形で出力してください。:
+
+1. <content></content>を注意深く読み、内容の性質(プロセス、関係性、時系列など)を把握する。
+2. 表現したい情報の種類を特定する。
+3. 図の目的(説明、分析、計画など)を考慮する。
+4. 以下のオプションから最適な図の種類を1つ選択する:
+
+<Choice>
+"FlowChart"
+"SequenceDiagram"
+"ClassDiagram"
+"StateDiagram"
+"ERDiagram"
+"UserJourney"
+"PieChart"
+"GanttChart"
+"QuadrantChart"
+"RequirementDiagram"
+"GitGraph"
+"MindMap"
+"SankeyChart"
+"XYChart"
+"BlockDiagram"
+"NetworkPacket"
+"Architecture"
+"Timeline"
+</Choice>
+
+5. 選択した図の種類を<output></output>タグ内に出力する。
+
+出力は<Choice>から選んだ図一つだけを<output></output>タグ内の文字列のみとし、それ以外の情報は一切含めないでください。
+</instruction>
+
+<content></content>
+
+<output></output>`;
+    else
+      return (
+        diagramSystemPrompts[params.diagramType!] ||
+        diagramSystemPrompts.FlowChart
+      );
+  },
+};
+
+const diagramSystemPrompts: { [key: string]: string } = {
+  flowchart: FlowchartPrompt,
+  sequencediagram: SequencePrompt,
+  classdiagram: ClassPrompt,
+  statediagram: StatePrompt,
+  erdiagram: ErPrompt,
+  userjourney: UserJourneyPrompt,
+  ganttchart: GanttChartPrompt,
+  piechart: PiechartPrompt,
+  quadrantchart: QuadrantchartPrompt,
+  requirementdiagram: RequirementPrompt,
+  gitgraph: GitgraphPrompt,
+  mindmap: MindmapPrompt,
+  sankeychart: SankeychartPrompt,
+  xychart: XychartPrompt,
+  blockdiagram: BlockPrompt,
+  networkpacket: NetworkpacketPrompt,
+  architecture: ArchitecturePrompt,
+  timeline: TimelinePrompt,
 };

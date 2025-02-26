@@ -24,7 +24,7 @@ export type SummarizeParams = {
   context?: string;
 };
 
-export type EditorialParams = {
+export type WriterParams = {
   sentence: string;
   context?: string;
 };
@@ -59,6 +59,11 @@ export type SetTitleParams = {
   messages: UnrecordedMessage[];
 };
 
+export type DiagramParams = {
+  determineType: boolean;
+  diagramType?: string;
+};
+
 export type PromptListItem = {
   title: string;
   systemContext: string;
@@ -76,7 +81,7 @@ export interface Prompter {
   systemContext(pathname: string): string;
   chatPrompt(params: ChatParams): string;
   summarizePrompt(params: SummarizeParams): string;
-  editorialPrompt(params: EditorialParams): string;
+  writerPrompt(params: WriterParams): string;
   generateTextPrompt(params: GenerateTextParams): string;
   translatePrompt(params: TranslateParams): string;
   webContentPrompt(params: WebContentParams): string;
@@ -84,4 +89,5 @@ export interface Prompter {
   videoAnalyzerPrompt(params: VideoAnalyzerParams): string;
   setTitlePrompt(params: SetTitleParams): string;
   promptList(): PromptList;
+  diagramPrompt(params: DiagramParams): string;
 }

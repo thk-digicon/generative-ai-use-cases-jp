@@ -5,5 +5,9 @@ node_modules
 
 /*/dist/**
 
+# MkDocs documentation
+site*/
+.cache
+
 # local added
 .vscode
