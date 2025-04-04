@@ -46,7 +46,3 @@ export VITE_APP_INLINE_AGENTS=$(extract_value "$stack_output" InlineAgents)
 export VITE_APP_USE_CASE_BUILDER_ENABLED=$(extract_value "$stack_output" UseCaseBuilderEnabled)
 export VITE_APP_OPTIMIZE_PROMPT_FUNCTION_ARN=$(extract_value "$stack_output" OptimizePromptFunctionArn)
 export VITE_APP_HIDDEN_USE_CASES=$(extract_value "$stack_output" HiddenUseCases)
-
-# AWS account指定
-export AWS_PROFILE='digi-poc'
-export AWS_DEFAULT_REGION='us-east-1'
