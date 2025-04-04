@@ -1,4 +1,4 @@
-import { Stack, RemovalPolicy } from 'aws-cdk-lib';
+import { Stack, RemovalPolicy, CfnResource } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import {
   CloudFrontToS3,
@@ -10,7 +10,12 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { Flow, HiddenUseCases } from 'generative-ai-use-cases-jp';
+import {
+  Flow,
+  HiddenUseCases,
+  ModelConfiguration,
+} from 'generative-ai-use-cases';
+import { ComputeType } from 'aws-cdk-lib/aws-codebuild';
 
 export interface WebProps {
   apiEndpointUrl: string;
@@ -27,8 +32,9 @@ export interface WebProps {
   selfSignUpEnabled: boolean;
   webAclId?: string;
   modelRegion: string;
-  modelIds: string[];
-  imageGenerationModelIds: string[];
+  modelIds: ModelConfiguration[];
+  imageGenerationModelIds: ModelConfiguration[];
+  videoGenerationModelIds: ModelConfiguration[];
   endpointNames: string[];
   samlAuthEnabled: boolean;
   samlCognitoDomainName?: string | null;
@@ -131,7 +137,7 @@ export class Web extends Construct {
       );
     }
 
-    new NodejsBuild(this, 'BuildWeb', {
+    const build = new NodejsBuild(this, 'BuildWeb', {
       assets: [
         {
           path: '../../',
@@ -162,7 +168,7 @@ export class Web extends Construct {
       outputSourceDirectory: './packages/web/dist',
       buildCommands: ['npm ci', 'npm run web:build'],
       buildEnvironment: {
-        NODE_OPTIONS: '--max-old-space-size=2048', // デプロイ時のCodeBuildのメモリを設定
+        NODE_OPTIONS: '--max-old-space-size=4096', // Memory for CodeBuild at deployment
         VITE_APP_API_ENDPOINT: props.apiEndpointUrl,
         VITE_APP_REGION: Stack.of(this).region,
         VITE_APP_USER_POOL_ID: props.userPoolId,
@@ -180,6 +186,7 @@ export class Web extends Construct {
         VITE_APP_MODEL_REGION: props.modelRegion,
         VITE_APP_MODEL_IDS: JSON.stringify(props.modelIds),
         VITE_APP_IMAGE_MODEL_IDS: JSON.stringify(props.imageGenerationModelIds),
+        VITE_APP_VIDEO_MODEL_IDS: JSON.stringify(props.videoGenerationModelIds),
         VITE_APP_ENDPOINT_NAMES: JSON.stringify(props.endpointNames),
         VITE_APP_SAMLAUTH_ENABLED: props.samlAuthEnabled.toString(),
         VITE_APP_SAML_COGNITO_DOMAIN_NAME: props.samlCognitoDomainName ?? '',
@@ -192,6 +199,10 @@ export class Web extends Construct {
         VITE_APP_HIDDEN_USE_CASES: JSON.stringify(props.hiddenUseCases),
       },
     });
+    // Enhance computing resources
+    (
+      build.node.findChild('Project').node.defaultChild as CfnResource
+    ).addPropertyOverride('Environment.ComputeType', ComputeType.MEDIUM);
 
     this.distribution = cloudFrontWebDistribution;
   }

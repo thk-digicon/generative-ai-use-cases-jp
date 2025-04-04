@@ -1,4 +1,4 @@
-// Feature Flag の型を定義
+// Define the type of Feature Flag
 export type FeatureFlags = {
   // Model Feature Flags
   text?: boolean;
@@ -14,4 +14,9 @@ export type FeatureFlags = {
   reranking?: boolean;
   // Additional Flags
   light?: boolean;
+};
+
+export type ModelConfiguration = {
+  modelId: string;
+  region: string;
 };

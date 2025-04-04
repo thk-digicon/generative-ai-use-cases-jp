@@ -1,4 +1,4 @@
-import { FeatureFlags } from 'generative-ai-use-cases-jp';
+import { FeatureFlags } from 'generative-ai-use-cases';
 
 // Manage Model Feature
 // https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference-supported-models-features.html
@@ -61,6 +61,8 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
     ...MODEL_FEATURE.TEXT_DOC_IMAGE,
     ...MODEL_FEATURE.LIGHT,
   },
+  'apac.anthropic.claude-3-5-sonnet-20241022-v2:0':
+    MODEL_FEATURE.TEXT_DOC_IMAGE,
   'apac.anthropic.claude-3-5-sonnet-20240620-v1:0':
     MODEL_FEATURE.TEXT_DOC_IMAGE,
   'apac.anthropic.claude-3-sonnet-20240229-v1:0': {
@@ -87,12 +89,34 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
     ...MODEL_FEATURE.TEXT_ONLY,
     ...MODEL_FEATURE.LIGHT,
   },
-  'us.amazon.nova-pro-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE, // S3 Video アップロードが us-east-1 のみ対応のため。 Video を利用したい場合は us-east-1 の amazon.nova-pro-v1:0 で利用できます。（注意: リージョン変更の際 RAG を有効化している場合削除されます）
+
+  // S3 Video Upload only supports us-east-1.
+  // If you want to use Video, please use amazon.nova-pro-v1:0 in us-east-1.
+  // (Note: If RAG is enabled, it will be deleted when the region is changed)
+  'us.amazon.nova-pro-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
   'us.amazon.nova-lite-v1:0': {
-    ...MODEL_FEATURE.TEXT_DOC_IMAGE, // 同上
+    ...MODEL_FEATURE.TEXT_DOC_IMAGE, // Same as above
     ...MODEL_FEATURE.LIGHT,
   },
   'us.amazon.nova-micro-v1:0': {
+    ...MODEL_FEATURE.TEXT_ONLY,
+    ...MODEL_FEATURE.LIGHT,
+  },
+  'eu.amazon.nova-pro-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE, // Same as above
+  'eu.amazon.nova-lite-v1:0': {
+    ...MODEL_FEATURE.TEXT_DOC_IMAGE, // Same as above
+    ...MODEL_FEATURE.LIGHT,
+  },
+  'eu.amazon.nova-micro-v1:0': {
+    ...MODEL_FEATURE.TEXT_ONLY,
+    ...MODEL_FEATURE.LIGHT,
+  },
+  'apac.amazon.nova-pro-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE, // Same as above
+  'apac.amazon.nova-lite-v1:0': {
+    ...MODEL_FEATURE.TEXT_DOC_IMAGE, // Same as above
+    ...MODEL_FEATURE.LIGHT,
+  },
+  'apac.amazon.nova-micro-v1:0': {
     ...MODEL_FEATURE.TEXT_ONLY,
     ...MODEL_FEATURE.LIGHT,
   },
@@ -116,6 +140,8 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
   // Cohere
   'cohere.command-r-v1:0': MODEL_FEATURE.TEXT_DOC,
   'cohere.command-r-plus-v1:0': MODEL_FEATURE.TEXT_DOC,
+  // DeepSeek
+  'us.deepseek.r1-v1:0': MODEL_FEATURE.TEXT_DOC,
 
   // === Image ===
 
@@ -134,7 +160,8 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
 
   // === Video ===
 
-  // TODO
+  'amazon.nova-reel-v1:0': MODEL_FEATURE.VIDEO_GEN,
+  'luma.ray-v2:0': MODEL_FEATURE.VIDEO_GEN,
 
   // === Embedding ===
 
@@ -159,6 +186,9 @@ export const BEDROCK_TEXT_MODELS = Object.keys(modelFeatureFlags).filter(
 );
 export const BEDROCK_IMAGE_GEN_MODELS = Object.keys(modelFeatureFlags).filter(
   (model) => modelFeatureFlags[model].image_gen
+);
+export const BEDROCK_VIDEO_GEN_MODELS = Object.keys(modelFeatureFlags).filter(
+  (model) => modelFeatureFlags[model].video_gen
 );
 export const BEDROCK_EMBEDDING_MODELS = Object.keys(modelFeatureFlags).filter(
   (model) => modelFeatureFlags[model].embedding
