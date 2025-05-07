@@ -19,6 +19,7 @@ const MODEL_FEATURE: Record<string, FeatureFlags> = {
   VIDEO_GEN: { video_gen: true },
   EMBEDDING: { embedding: true },
   RERANKING: { reranking: true },
+  SPEECH_TO_SPEECH: { speechToSpeech: true },
   // Additional Flags
   LIGHT: { light: true },
 };
@@ -93,6 +94,7 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
   // S3 Video Upload only supports us-east-1.
   // If you want to use Video, please use amazon.nova-pro-v1:0 in us-east-1.
   // (Note: If RAG is enabled, it will be deleted when the region is changed)
+  'us.amazon.nova-premier-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
   'us.amazon.nova-pro-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
   'us.amazon.nova-lite-v1:0': {
     ...MODEL_FEATURE.TEXT_DOC_IMAGE, // Same as above
@@ -131,6 +133,8 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
   'us.meta.llama3-2-11b-instruct-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
   'us.meta.llama3-2-90b-instruct-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
   'us.meta.llama3-3-70b-instruct-v1:0': MODEL_FEATURE.TEXT_DOC,
+  'us.meta.llama4-maverick-17b-instruct-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
+  'us.meta.llama4-scout-17b-instruct-v1:0': MODEL_FEATURE.TEXT_DOC_IMAGE,
   // Mistral
   'mistral.mistral-7b-instruct-v0:2': MODEL_FEATURE.TEXT_DOC,
   'mistral.mixtral-8x7b-instruct-v0:1': MODEL_FEATURE.TEXT_DOC,
@@ -144,6 +148,9 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
   'cohere.command-r-plus-v1:0': MODEL_FEATURE.TEXT_DOC,
   // DeepSeek
   'us.deepseek.r1-v1:0': MODEL_FEATURE.TEXT_DOC,
+  // Writer
+  'us.writer.palmyra-x4-v1:0': MODEL_FEATURE.TEXT_DOC,
+  'us.writer.palmyra-x5-v1:0': MODEL_FEATURE.TEXT_DOC,
 
   // === Image ===
 
@@ -182,6 +189,11 @@ export const modelFeatureFlags: Record<string, FeatureFlags> = {
   'amazon.rerank-v1:0': MODEL_FEATURE.RERANKING,
   // Cohere
   'cohere.rerank-v3-5:0': MODEL_FEATURE.RERANKING,
+
+  // === Speech to Speech ===
+
+  // Amazon
+  'amazon.nova-sonic-v1:0': MODEL_FEATURE.SPEECH_TO_SPEECH,
 };
 
 export const BEDROCK_TEXT_MODELS = Object.keys(modelFeatureFlags).filter(
@@ -199,3 +211,6 @@ export const BEDROCK_EMBEDDING_MODELS = Object.keys(modelFeatureFlags).filter(
 export const BEDROCK_RERANKING_MODELS = Object.keys(modelFeatureFlags).filter(
   (model) => modelFeatureFlags[model].reranking
 );
+export const BEDROCK_SPEECH_TO_SPEECH_MODELS = Object.keys(
+  modelFeatureFlags
+).filter((model) => modelFeatureFlags[model].speechToSpeech);

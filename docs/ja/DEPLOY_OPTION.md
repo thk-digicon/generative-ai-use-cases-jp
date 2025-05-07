@@ -634,6 +634,15 @@ const envs: Record<string, Partial<StackInput>> = {
 }
 ```
 
+### 音声チャットユースケースの有効化
+
+> [!NOTE]
+> 音声チャットの反応速度はアプリケーションのリージョン (GenerativeAiUseCasesStack がデプロイされたリージョン) に大きく影響を受けます。反応が遅延する場合は、ユーザーがアプリケーションのリージョンと物理的に近い距離にいるかを確認してください。
+
+`speechToSpeechModelIds` にモデルを 1 つ以上定義すると有効化されます。
+`speechToSpeechModelIds` に関しては [Amazon Bedrock のモデルを変更する](#amazon-bedrock-のモデルを変更する) をご参照ください。
+デフォルト値は [packages/cdk/lib/stack-input.ts](/packages/cdk/lib/stack-input.ts) をご参照ください。
+
 ### 画像生成ユースケースの有効化
 
 `imageGenerationModelIds` にモデルを 1 つ以上定義すると有効化されます。
@@ -670,12 +679,15 @@ const envs: Record<string, Partial<StackInput>> = {
 "apac.anthropic.claude-3-sonnet-20240229-v1:0",
 "apac.anthropic.claude-3-5-sonnet-20240620-v1:0",
 "apac.anthropic.claude-3-5-sonnet-20241022-v2:0",
+"us.meta.llama4-maverick-17b-instruct-v1:0",
+"us.meta.llama4-scout-17b-instruct-v1:0",
 "us.meta.llama3-2-90b-instruct-v1:0",
 "us.meta.llama3-2-11b-instruct-v1:0",
 "us.mistral.pixtral-large-2502-v1:0",
 "eu.mistral.pixtral-large-2502-v1:0",
 "amazon.nova-pro-v1:0",
 "amazon.nova-lite-v1:0",
+"us.amazon.nova-premier-v1:0",
 "us.amazon.nova-pro-v1:0",
 "us.amazon.nova-lite-v1:0",
 "eu.amazon.nova-pro-v1:0",
@@ -740,6 +752,7 @@ const envs: Record<string, Partial<StackInput>> = {
       video: true, // 動画生成を非表示
       videoAnalyzer: true, // 映像分析を非表示
       diagram: true, // ダイアグラム生成を非表示
+      voiceChat: true, // 音声チャットを非表示
     },
   },
 };
@@ -760,7 +773,8 @@ const envs: Record<string, Partial<StackInput>> = {
       "image": true,
       "video": true,
       "videoAnalyzer": true,
-      "diagram": true
+      "diagram": true,
+      "voiceChat": true
     }
   }
 }
@@ -794,7 +808,7 @@ const envs: Record<string, Partial<StackInput>> = {
 
 ## Amazon Bedrock のモデルを変更する
 
-`parameter.ts` もしくは `cdk.json` の `modelRegion`, `modelIds`, `imageGenerationModelIds`, `videoGenerationModelIds` でモデルとモデルのリージョンを指定します。`modelIds` と `imageGenerationModelIds` と `videoGenerationModelIds` は指定したリージョンで利用できるモデルの中から利用したいモデルのリストで指定してください。AWS ドキュメントに、[モデルの一覧](https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html)と[リージョン別のモデルサポート一覧](https://docs.aws.amazon.com/bedrock/latest/userguide/models-regions.html)があります。
+`parameter.ts` もしくは `cdk.json` の `modelRegion`, `modelIds`, `imageGenerationModelIds`, `videoGenerationModelIds`, `speechToSpeechModelIds` でモデルとモデルのリージョンを指定します。`modelIds` と `imageGenerationModelIds` と `videoGenerationModelIds` と `speechToSpeechModelIds` は指定したリージョンで利用できるモデルの中から利用したいモデルのリストで指定してください。AWS ドキュメントに、[モデルの一覧](https://docs.aws.amazon.com/bedrock/latest/userguide/model-ids.html)と[リージョン別のモデルサポート一覧](https://docs.aws.amazon.com/bedrock/latest/userguide/models-regions.html)があります。
 
 また、[cross-region inference](https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference-support.html)のモデルに対応しています。cross-region inference のモデルは `{us|eu|apac}.{model-provider}.{model-name}` で表されるモデルで、設定した modelRegion で指定したリージョンの `{us|eu|apac}` と一致している必要があります。
 
@@ -824,7 +838,11 @@ const envs: Record<string, Partial<StackInput>> = {
 "apac.anthropic.claude-3-5-sonnet-20240620-v1:0",
 "apac.anthropic.claude-3-5-sonnet-20241022-v2:0",
 "us.deepseek.r1-v1:0",
+"us.writer.palmyra-x5-v1:0",
+"us.writer.palmyra-x4-v1:0",
 "amazon.titan-text-premier-v1:0",
+"us.meta.llama4-maverick-17b-instruct-v1:0",
+"us.meta.llama4-scout-17b-instruct-v1:0",
 "us.meta.llama3-3-70b-instruct-v1:0",
 "us.meta.llama3-2-90b-instruct-v1:0",
 "us.meta.llama3-2-11b-instruct-v1:0",
@@ -850,6 +868,7 @@ const envs: Record<string, Partial<StackInput>> = {
 "amazon.nova-pro-v1:0",
 "amazon.nova-lite-v1:0",
 "amazon.nova-micro-v1:0",
+"us.amazon.nova-premier-v1:0",
 "us.amazon.nova-pro-v1:0",
 "us.amazon.nova-lite-v1:0",
 "us.amazon.nova-micro-v1:0",
@@ -859,6 +878,12 @@ const envs: Record<string, Partial<StackInput>> = {
 "apac.amazon.nova-pro-v1:0",
 "apac.amazon.nova-lite-v1:0",
 "apac.amazon.nova-micro-v1:0"
+```
+
+このソリューションが対応している speech-to-speech モデルは以下です。
+
+```
+amazon.nova-sonic-v1:0
 ```
 
 このソリューションが対応している画像生成モデルは以下です。
@@ -888,7 +913,7 @@ const envs: Record<string, Partial<StackInput>> = {
 
 ### 複数のリージョンのモデルを同時に利用する
 
-GenU では、特に指定がない限り`modelRegion`のモデルを使用します。一部リージョンのみで利用可能な最新モデル等を使いたい場合、`modelIds`または`imageGenerationModelIds`または`videoGenerationModelIds`に`{modelId: '<モデル名>', region: '<リージョンコード>'}`を指定することで、そのモデルのみ指定したリージョンから呼び出すことができます。
+GenU では、特に指定がない限り`modelRegion`のモデルを使用します。一部リージョンのみで利用可能な最新モデル等を使いたい場合、`modelIds`または`imageGenerationModelIds`または`videoGenerationModelIds`または`speechToSpeechModelIds`に`{modelId: '<モデル名>', region: '<リージョンコード>'}`を指定することで、そのモデルのみ指定したリージョンから呼び出すことができます。
 
 > [!NOTE] > [モニタリング用ダッシュボード](#モニタリング用のダッシュボードの有効化)と複数リージョンのモデル利用を併用する場合、デフォルトのダッシュボード設定では主リージョン（`modelRegion`で指定したリージョン）以外のモデルのプロンプトログが表示されません。
 >
@@ -921,8 +946,9 @@ const envs: Record<string, Partial<StackInput>> = {
       'apac.amazon.nova-lite-v1:0',
       'apac.amazon.nova-micro-v1:0',
       { modelId: 'us.deepseek.r1-v1:0', region: 'us-east-1' },
-      { modelId: 'us.meta.llama3-3-70b-instruct-v1:0', region: 'us-east-1' },
-      { modelId: 'us.meta.llama3-2-90b-instruct-v1:0', region: 'us-east-1' },
+      { modelId: 'us.writer.palmyra-x5-v1:0', region: 'us-west-2' }
+      { modelId: 'us.meta.llama4-maverick-17b-instruct-v1:0', region: 'us-east-1' },
+      { modelId: 'us.meta.llama4-scout-17b-instruct-v1:0', region: 'us-east-1' },
       { modelId: 'us.mistral.pixtral-large-2502-v1:0', region: 'us-east-1' },
     ],
     imageGenerationModelIds: [
@@ -934,6 +960,9 @@ const envs: Record<string, Partial<StackInput>> = {
     videoGenerationModelIds: [
       'amazon.nova-reel-v1:0',
       { modelId: 'luma.ray-v2:0', region: 'us-west-2' },
+    ],
+    speechToSpeechModelIds: [
+      { modelId: 'amazon.nova-sonic-v1:0', region: 'us-east-1' },
     ],
   },
 };
@@ -964,11 +993,19 @@ const envs: Record<string, Partial<StackInput>> = {
         "region": "us-east-1"
       },
       {
-        "modelId": "us.meta.llama3-3-70b-instruct-v1:0",
+        "modelId": "us.writer.palmyra-x5-v1:0",
+        "region": "us-west-2"
+      },
+      {
+        "modelId": "us.meta.llama4-maverick-17b-instruct-v1:0",
         "region": "us-east-1"
       },
       {
-        "modelId": "us.meta.llama3-2-90b-instruct-v1:0",
+        "modelId": "us.meta.llama4-scout-17b-instruct-v1:0",
+        "region": "us-east-1"
+      },
+      {
+        "modelId": "us.mistral.pixtral-large-2502-v1:0",
         "region": "us-east-1"
       }
     ],
@@ -992,6 +1029,12 @@ const envs: Record<string, Partial<StackInput>> = {
       {
         "modelId": "luma.ray-v2:0",
         "region": "us-west-2"
+      }
+    ],
+    "speechToSpeechModelIds": [
+      {
+        "modelId": "amazon.nova-sonic-v1:0",
+        "region": "us-east-1"
       }
     ]
   }
@@ -1028,6 +1071,7 @@ const envs: Record<string, Partial<StackInput>> = {
       'stability.stable-diffusion-xl-v1',
     ],
     videoGenerationModelIds: ['amazon.nova-reel-v1:1'],
+    speechToSpeechModelIds: ['amazon.nova-sonic-v1:0'],
   },
 };
 ```
@@ -1059,7 +1103,8 @@ const envs: Record<string, Partial<StackInput>> = {
       "amazon.titan-image-generator-v1",
       "stability.stable-diffusion-xl-v1"
     ],
-    "videoGenerationModelIds": ["amazon.nova-reel-v1:1"]
+    "videoGenerationModelIds": ["amazon.nova-reel-v1:1"],
+    "speechToSpeechModelIds": ["amazon.nova-sonic-v1:0"]
   }
 }
 ```
@@ -1144,21 +1189,20 @@ const envs: Record<string, Partial<StackInput>> = {
 // parameter.ts
 const envs: Record<string, Partial<StackInput>> = {
   dev: {
-    modelRegion: 'us-east-2',
+    modelRegion: 'us-west-2',
     modelIds: [
       "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-      "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
       "us.anthropic.claude-3-5-haiku-20241022-v1:0",
-      "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
-      "us.anthropic.claude-3-opus-20240229-v1:0",
-      "us.anthropic.claude-3-sonnet-20240229-v1:0",
       "us.anthropic.claude-3-haiku-20240307-v1:0",
       "us.deepseek.r1-v1:0",
-      "us.meta.llama3-3-70b-instruct-v1:0",
-      "us.meta.llama3-2-90b-instruct-v1:0",
+      "us.writer.palmyra-x5-v1:0",
+      "us.writer.palmyra-x4-v1:0",
+      "us.meta.llama4-maverick-17b-instruct-v1:0",
+      "us.meta.llama4-scout-17b-instruct-v1:0",
       "us.meta.llama3-2-11b-instruct-v1:0",
       "us.meta.llama3-2-3b-instruct-v1:0",
       "us.meta.llama3-2-1b-instruct-v1:0",
+      "us.amazon.nova-premier-v1:0",
       "us.amazon.nova-pro-v1:0",
       "us.amazon.nova-lite-v1:0",
       "us.amazon.nova-micro-v1:0",
@@ -1190,18 +1234,17 @@ const envs: Record<string, Partial<StackInput>> = {
     "modelRegion": "us-west-2",
     "modelIds": [
       "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-      "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
       "us.anthropic.claude-3-5-haiku-20241022-v1:0",
-      "us.anthropic.claude-3-5-sonnet-20240620-v1:0",
-      "us.anthropic.claude-3-opus-20240229-v1:0",
-      "us.anthropic.claude-3-sonnet-20240229-v1:0",
       "us.anthropic.claude-3-haiku-20240307-v1:0",
       "us.deepseek.r1-v1:0",
-      "us.meta.llama3-3-70b-instruct-v1:0",
-      "us.meta.llama3-2-90b-instruct-v1:0",
+      "us.writer.palmyra-x5-v1:0",
+      "us.writer.palmyra-x4-v1:0",
+      "us.meta.llama4-maverick-17b-instruct-v1:0",
+      "us.meta.llama4-scout-17b-instruct-v1:0",
       "us.meta.llama3-2-11b-instruct-v1:0",
       "us.meta.llama3-2-3b-instruct-v1:0",
       "us.meta.llama3-2-1b-instruct-v1:0",
+      "us.amazon.nova-premier-v1:0",
       "us.amazon.nova-pro-v1:0",
       "us.amazon.nova-lite-v1:0",
       "us.amazon.nova-micro-v1:0",
