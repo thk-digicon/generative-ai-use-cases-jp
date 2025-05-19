@@ -11150,6 +11150,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
             "TABLE_NAME": {
               "Ref": "DatabaseTableF104A135",
             },
+            "VIDEO_BUCKET_OWNER": "123456890123",
             "VIDEO_BUCKET_REGION_MAP": {
               "Fn::Join": [
                 "",
@@ -11308,6 +11309,11 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
         "Code": {
           "S3Bucket": "cdk-hnb659fds-assets-123456890123-us-east-1",
           "S3Key": "HASH-REPLACED.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "CROSS_ACCOUNT_BEDROCK_ROLE_ARN": "",
+          },
         },
         "Handler": "index.handler",
         "Role": {
@@ -15954,6 +15960,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
         },
         "Environment": {
           "Variables": {
+            "CROSS_ACCOUNT_BEDROCK_ROLE_ARN": "",
             "KNOWLEDGE_BASE_ID": {
               "Fn::ImportValue": "RagKnowledgeBaseStack:ExportsOutputRefKnowledgeBaseD054384B",
             },
@@ -16328,6 +16335,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
             "ApiId",
           ],
         },
+        "HandlerConfigs": {},
         "Name": "speech-to-speech",
       },
       "Type": "AWS::AppSync::ChannelNamespace",
@@ -16505,6 +16513,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
         },
         "Environment": {
           "Variables": {
+            "CROSS_ACCOUNT_BEDROCK_ROLE_ARN": "",
             "EVENT_API_ENDPOINT": {
               "Fn::Join": [
                 "",
@@ -17627,6 +17636,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
           },
         },
         "Handler": "index.handler",
+        "MemorySize": 512,
         "Role": {
           "Fn::GetAtt": [
             "UseCaseBuilderGetUseCaseServiceRoleF32AAC5F",
@@ -17745,6 +17755,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
           },
         },
         "Handler": "index.handler",
+        "MemorySize": 512,
         "Role": {
           "Fn::GetAtt": [
             "UseCaseBuilderListFavoriteUseCasesServiceRole5BCFD9A7",
@@ -17863,6 +17874,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
           },
         },
         "Handler": "index.handler",
+        "MemorySize": 512,
         "Role": {
           "Fn::GetAtt": [
             "UseCaseBuilderListRecentlyUsedUseCasesServiceRole977F8D35",
@@ -17981,6 +17993,7 @@ exports[`GenerativeAiUseCases matches the snapshot 5`] = `
           },
         },
         "Handler": "index.handler",
+        "MemorySize": 512,
         "Role": {
           "Fn::GetAtt": [
             "UseCaseBuilderListUseCasesServiceRoleDE660444",

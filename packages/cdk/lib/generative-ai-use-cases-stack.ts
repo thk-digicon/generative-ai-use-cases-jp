@@ -113,6 +113,7 @@ export class GenerativeAiUseCasesStack extends Stack {
       api: api.api,
       userPool: auth.userPool,
       speechToSpeechModelIds: params.speechToSpeechModelIds,
+      crossAccountBedrockRoleArn: params.crossAccountBedrockRoleArn,
     });
 
     // Web Frontend
@@ -185,6 +186,7 @@ export class GenerativeAiUseCasesStack extends Stack {
       if (knowledgeBaseId) {
         new RagKnowledgeBase(this, 'RagKnowledgeBase', {
           modelRegion: params.modelRegion,
+          crossAccountBedrockRoleArn: params.crossAccountBedrockRoleArn,
           knowledgeBaseId: knowledgeBaseId,
           userPool: auth.userPool,
           api: api.api,
