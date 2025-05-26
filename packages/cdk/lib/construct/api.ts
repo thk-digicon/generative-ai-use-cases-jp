@@ -109,6 +109,19 @@ export class Api extends Construct {
       throw new Error(`Unsupported Model Name: ${rerankingModelId}`);
     }
 
+    // We don't support using the same model ID accross multiple regions
+    const duplicateModelIds = new Set(
+      [...modelIds, ...imageGenerationModelIds, ...videoGenerationModelIds]
+        .map((m) => m.modelId)
+        .filter((item, index, arr) => arr.indexOf(item) !== index)
+    );
+    if (duplicateModelIds.size > 0) {
+      throw new Error(
+        'Duplicate model IDs detected. Using the same model ID multiple times is not supported:\n' +
+          [...duplicateModelIds].map((s) => `- ${s}\n`).join('\n')
+      );
+    }
+
     // Agent Map
     const agentMap: AgentMap = {};
     for (const agent of agents) {
@@ -493,9 +506,10 @@ export class Api extends Construct {
       timeout: Duration.minutes(15),
       environment: {
         TABLE_NAME: table.tableName,
+        BUCKET_NAME: fileBucket.bucketName,
       },
     });
-    table.grantWriteData(createMessagesFunction);
+    table.grantReadWriteData(createMessagesFunction);
 
     const updateChatTitleFunction = new NodejsFunction(
       this,
@@ -549,7 +563,7 @@ export class Api extends Construct {
         TABLE_NAME: table.tableName,
       },
     });
-    table.grantWriteData(updateFeedbackFunction);
+    table.grantReadWriteData(updateFeedbackFunction);
 
     const getWebTextFunction = new NodejsFunction(this, 'GetWebText', {
       runtime: Runtime.NODEJS_LATEST,
@@ -565,7 +579,7 @@ export class Api extends Construct {
         TABLE_NAME: table.tableName,
       },
     });
-    table.grantWriteData(createShareId);
+    table.grantReadWriteData(createShareId);
 
     const getSharedChat = new NodejsFunction(this, 'GetSharedChat', {
       runtime: Runtime.NODEJS_LATEST,

@@ -1,5 +1,8 @@
 import { Model, ModelConfiguration } from 'generative-ai-use-cases';
-import { modelFeatureFlags } from '@generative-ai-use-cases/common';
+import {
+  CRI_PREFIX_PATTERN,
+  modelMetadata,
+} from '@generative-ai-use-cases/common';
 
 const modelRegion = import.meta.env.VITE_APP_MODEL_REGION;
 
@@ -18,9 +21,13 @@ const bedrockModelIds: string[] = bedrockModelConfigs.map(
 const modelIdsInModelRegion: string[] = bedrockModelConfigs
   .filter((model) => model.region === modelRegion)
   .map((model) => model.modelId);
-
+const duplicateBaseModelIds = new Set(
+  bedrockModelIds
+    .map((modelId) => modelId.replace(CRI_PREFIX_PATTERN, ''))
+    .filter((item, index, arr) => arr.indexOf(item) !== index)
+);
 const visionModelIds: string[] = bedrockModelIds.filter(
-  (modelId) => modelFeatureFlags[modelId].image
+  (modelId) => modelMetadata[modelId].flags.image
 );
 const visionEnabled: boolean = visionModelIds.length > 0;
 
@@ -155,11 +162,24 @@ export const findModelByModelId = (modelId: string) => {
 
 const searchAgent = agentNames.find((name) => name.includes('Search'));
 
+const modelDisplayName = (modelId: string): string => {
+  // If there are multiple instances of the same model, add CRI suffix to the display name
+  let displayName = modelMetadata[modelId]?.displayName ?? modelId;
+  if (duplicateBaseModelIds.has(modelId.replace(CRI_PREFIX_PATTERN, ''))) {
+    const criMatch = modelId.match(CRI_PREFIX_PATTERN);
+    if (criMatch) {
+      displayName += ` (${criMatch[1].toUpperCase()})`;
+    }
+  }
+  return displayName;
+};
+
 export const MODELS = {
   modelRegion: modelRegion,
   modelIds: [...bedrockModelIds, ...endpointNames],
   modelIdsInModelRegion,
-  modelFeatureFlags: modelFeatureFlags,
+  modelMetadata,
+  modelDisplayName,
   visionModelIds: visionModelIds,
   visionEnabled: visionEnabled,
   imageGenModelIds: imageGenModelIds,
