@@ -11,6 +11,9 @@ import {
   PiChalkboardTeacher,
   PiFloppyDisk,
   PiArrowClockwise,
+  PiNotePencil,
+  PiCheck,
+  PiX,
 } from 'react-icons/pi';
 import { BaseProps } from '../@types/common';
 import { ShownMessage, UpdateFeedbackRequest } from 'generative-ai-use-cases';
@@ -19,6 +22,7 @@ import useChat from '../hooks/useChat';
 import useTyping from '../hooks/useTyping';
 import FileCard from './FileCard';
 import FeedbackForm from './FeedbackForm';
+import Textarea from './Textarea';
 import useFiles from '../hooks/useFiles';
 import { useTranslation } from 'react-i18next';
 
@@ -31,7 +35,9 @@ type Props = BaseProps & {
   setSaveSystemContext?: (s: string) => void;
   setShowSystemContextModal?: (value: boolean) => void;
   allowRetry?: boolean;
+  editable?: boolean;
   retryGeneration?: () => void;
+  onCommitEdit?: (modifiedPrompt: string) => void;
 };
 
 const ChatMessage: React.FC<Props> = (props) => {
@@ -45,6 +51,8 @@ const ChatMessage: React.FC<Props> = (props) => {
   const [isSendingFeedback, setIsSendingFeedback] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [showThankYouMessage, setShowThankYouMessage] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editingPrompt, setEditingPrompt] = useState('');
   const { getFileDownloadSignedUrl } = useFiles(pathname);
 
   const { setTypingTextInput, typingTextOutput } = useTyping(
@@ -52,7 +60,7 @@ const ChatMessage: React.FC<Props> = (props) => {
   );
 
   useEffect(() => {
-    if (chatContent?.content) {
+    if (chatContent?.content !== undefined && chatContent?.content !== null) {
       setTypingTextInput(chatContent?.content);
     }
   }, [chatContent, setTypingTextInput]);
@@ -208,7 +216,13 @@ const ChatMessage: React.FC<Props> = (props) => {
               </div>
             )}
             {chatContent?.role === 'user' && (
-              <div className="whitespace-pre-wrap">{typingTextOutput}</div>
+              <>
+                {editing ? (
+                  <Textarea value={editingPrompt} onChange={setEditingPrompt} />
+                ) : (
+                  <div className="whitespace-pre-wrap">{typingTextOutput}</div>
+                )}
+              </>
             )}
             {chatContent?.role === 'assistant' && (
               <Markdown prefix={`${props.idx}`}>
@@ -246,6 +260,37 @@ const ChatMessage: React.FC<Props> = (props) => {
               }}>
               <PiFloppyDisk />
             </ButtonIcon>
+          )}
+          {chatContent?.role === 'user' && props.editable && (
+            <>
+              {editing ? (
+                <>
+                  <ButtonIcon
+                    onClick={() => {
+                      setEditing(false);
+                    }}>
+                    <PiX className="text-red-500" />
+                  </ButtonIcon>
+                  <ButtonIcon
+                    onClick={() => {
+                      if (props.onCommitEdit) {
+                        setEditing(false);
+                        props.onCommitEdit(editingPrompt);
+                      }
+                    }}>
+                    <PiCheck className="text-green-500" />
+                  </ButtonIcon>
+                </>
+              ) : (
+                <ButtonIcon
+                  onClick={() => {
+                    setEditingPrompt(chatContent?.content ?? '');
+                    setEditing(true);
+                  }}>
+                  <PiNotePencil className="text-gray-400" />
+                </ButtonIcon>
+              )}
+            </>
           )}
           {chatContent?.role === 'assistant' &&
             !props.loading &&
