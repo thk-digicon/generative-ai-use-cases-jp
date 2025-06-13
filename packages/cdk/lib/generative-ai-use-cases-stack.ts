@@ -10,6 +10,7 @@ import {
   Transcribe,
   CommonWebAcl,
   SpeechToSpeech,
+  McpApi,
 } from './construct';
 import { CfnWebACLAssociation } from 'aws-cdk-lib/aws-wafv2';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
@@ -81,6 +82,7 @@ export class GenerativeAiUseCasesStack extends Stack {
       idPool: auth.idPool,
       userPoolClient: auth.client,
       table: database.table,
+      statsTable: database.statsTable,
       knowledgeBaseId: params.ragKnowledgeBaseId || props.knowledgeBaseId,
       agents: props.agents,
       guardrailIdentify: props.guardrailIdentifier,
@@ -118,6 +120,15 @@ export class GenerativeAiUseCasesStack extends Stack {
       crossAccountBedrockRoleArn: params.crossAccountBedrockRoleArn,
     });
 
+    // MCP
+    let mcpEndpoint: string | null = null;
+    if (params.mcpEnabled) {
+      const mcpApi = new McpApi(this, 'McpApi', {
+        idPool: auth.idPool,
+      });
+      mcpEndpoint = mcpApi.endpoint;
+    }
+
     // Web Frontend
     const web = new Web(this, 'Api', {
       // Auth
@@ -150,6 +161,8 @@ export class GenerativeAiUseCasesStack extends Stack {
       speechToSpeechNamespace: speechToSpeech.namespace,
       speechToSpeechEventApiEndpoint: speechToSpeech.eventApiEndpoint,
       speechToSpeechModelIds: params.speechToSpeechModelIds,
+      mcpEnabled: params.mcpEnabled,
+      mcpEndpoint,
       // Frontend
       hiddenUseCases: params.hiddenUseCases,
       // Custom Domain
@@ -356,6 +369,14 @@ export class GenerativeAiUseCasesStack extends Stack {
 
     new CfnOutput(this, 'SpeechToSpeechModelIds', {
       value: JSON.stringify(params.speechToSpeechModelIds),
+    });
+
+    new CfnOutput(this, 'McpEnabled', {
+      value: params.mcpEnabled.toString(),
+    });
+
+    new CfnOutput(this, 'McpEndpoint', {
+      value: mcpEndpoint ?? '',
     });
 
     this.userPool = auth.userPool;

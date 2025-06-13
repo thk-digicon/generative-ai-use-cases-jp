@@ -63,6 +63,8 @@ const Setting = () => {
     setSettingShowUseCaseBuilder,
     settingShowTools,
     setSettingShowTools,
+    settingShowEmail,
+    setSettingShowEmail,
   } = useUserSetting();
 
   const onClickSignout = useCallback(() => {
@@ -146,9 +148,28 @@ const Setting = () => {
           }></SettingItem>
 
         <SettingItem
+          name={t('setting.items.show_email')}
+          value={
+            <Switch
+              checked={settingShowEmail}
+              label=""
+              onSwitch={setSettingShowEmail}
+            />
+          }></SettingItem>
+
+        <SettingItem
           name={t('setting.items.login_status')}
           value={
             <Button onClick={onClickSignout}>{t('setting.signout')}</Button>
+          }></SettingItem>
+
+        <SettingItem
+          name={t('setting.items.stats')}
+          value={
+            <Link to="/stats" className="flex items-center">
+              {t('setting.items.stats')}{' '}
+              <PiArrowSquareOut className="text-base" />
+            </Link>
           }></SettingItem>
       </div>
 
