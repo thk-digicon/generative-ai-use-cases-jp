@@ -49,6 +49,7 @@
     "endpointNames": [],
     "agentEnabled": false,
     "searchAgentEnabled": false,
+    "searchEngine": "Brave",
     "searchApiKey": "",
     "agents": [],
     "inlineAgents": false,

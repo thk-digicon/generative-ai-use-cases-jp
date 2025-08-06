@@ -17,6 +17,8 @@ chat:
   delete_link: Delete Link
   delete_link_message: You can stop sharing the conversation history by deleting the link.
   drop_files: Drop files here
+  hint_cmd_enter: ⌘ + Enter to Submit
+  hint_ctrl_enter: Ctrl + Enter to Submit
   history: Conversation History
   initialize: Initialize
   model_parameters: Model Parameters
@@ -662,11 +664,19 @@ meetingMinutes:
   frequency_1min: Every 1 minute
   frequency_5min: Every 5 minutes
   generate: Generate
-  generate_minutes_header: Generate Minutes
+  generate_minutes_header: Generate Meeting Minutes
   generated_minutes: Generated Minutes
   generating: Generating minutes...
   generation_error: Failed to generate meeting minutes. Please try again.
   generation_success: Meeting minutes generated successfully
+  language: Language
+  language_auto: Auto Detect
+  language_chinese: Chinese
+  language_english: English
+  language_japanese: Japanese
+  language_korean: Korean
+  language_thai: Thai
+  language_vietnamese: Vietnamese
   last_generated: Last generated {{time}}
   minutes_placeholder: Minutes will appear here after generation
   model: Model
@@ -774,6 +784,7 @@ setting:
     agent_enabled: Agent Enabled
     language: Language
     language_help: Change display language
+    line_break_enter: Press Enter to create new line
     login_status: Login status
     rag_enabled: RAG (Amazon Kendra) Enabled
     rag_kb_enabled: RAG (Knowledge Base) Enabled
@@ -824,11 +835,17 @@ summarize:
   title: Summarize
 transcribe:
   detailed_parameters: Detailed parameters
+  direct_input: Direct Input
+  direct_input_instruction: Please enter the source text for meeting minutes directly in the "Transcript" area below.
+  direct_input_placeholder: Please enter the source text for meeting minutes here...
   file_upload: File Upload
   max_speakers: Max Speakers
   max_speakers_help: Maximum number of speakers to recognize
   mic_input: Microphone Input
   result_placeholder: Speech recognition results will be displayed here
+  screen_audio: Screen Audio
+  screen_audio_error: 'Screen Audio Error:'
+  screen_audio_notice: 'For Windows: Select "Entire Screen" tab and turn ON "Share system audio".<br/>For Mac: Select "Chrome Tab" and turn ON "Also share tab audio".<br/>Chrome and Edge work. Firefox does not work.'
   select_input_method: Please select from microphone input or file upload
   speaker_names: Speaker names (comma separated)
   speaker_recognition: Speaker recognition

@@ -15,6 +15,8 @@ chat:
   delete_link: ลบลิงก์
   delete_link_message: คุณสามารถหยุดการแชร์ประวัติการสนทนาโดยการลบลิงก์
   drop_files: วางไฟล์ที่นี่
+  hint_cmd_enter: ⌘ + Enter เพื่อส่ง
+  hint_ctrl_enter: Ctrl + Enter เพื่อส่ง
   history: ประวัติการสนทนา
   initialize: เริ่มต้นใหม่
   model_parameters: พารามิเตอร์โมเดล
@@ -567,6 +569,14 @@ meetingMinutes:
   generating: กำลังสร้างรายงานการประชุม...
   generation_error: ไม่สามารถสร้างรายงานการประชุมได้ กรุณาลองอีกครั้ง
   generation_success: สร้างรายงานการประชุมสำเร็จ
+  language: ภาษา
+  language_auto: ตรวจจับอัตโนมัติ
+  language_chinese: จีน
+  language_english: อังกฤษ
+  language_japanese: ญี่ปุ่น
+  language_korean: เกาหลี
+  language_thai: ไทย
+  language_vietnamese: เวียดนาม
   last_generated: สร้างล่าสุดเมื่อ {{time}}
   minutes_placeholder: รายงานการประชุมจะปรากฏที่นี่หลังจากสร้าง
   model: โมเดล
@@ -664,8 +674,15 @@ setting:
     agent_enabled: เปิดใช้งานตัวแทน
     language: ภาษา
     language_help: เปลี่ยนภาษาที่แสดง
+    line_break_enter: กด Enter เพื่อขึ้นบรรทัดใหม่
+    login_status: สถานะการเข้าสู่ระบบ
     rag_enabled: เปิดใช้งาน RAG (Amazon Kendra)
     rag_kb_enabled: เปิดใช้งาน RAG (Knowledge Base)
+    show_email: แสดงอีเมล
+    show_tools: แสดงเครื่องมือ
+    show_use_case_builder: แสดง Use Case Builder
+    stats: สถิติ
+    typing_animation: แอนิเมชันการพิมพ์
     version: เวอร์ชัน
     version_help: อ้างอิงเวอร์ชันใน package.json ของ generative-ai-use-cases
   recent_updates: การอัปเดตล่าสุด
@@ -692,11 +709,17 @@ summarize:
   title: สรุป
 transcribe:
   detailed_parameters: ตั้งค่าขั้นสูงแบบกำหนดเอง
+  direct_input: ป้อนข้อมูลโดยตรง
+  direct_input_instruction: โปรดป้อนข้อความต้นฉบับสำหรับรายงานการประชุมโดยตรงในพื้นที่ "บันทึกการถอดความ" ด้านล่าง
+  direct_input_placeholder: โปรดป้อนข้อความต้นฉบับสำหรับรายงานการประชุมที่นี่...
   file_upload: อัปโหลดไฟล์
   max_speakers: จำนวนผู้พูดสูงสุด
   max_speakers_help: จำนวนผู้พูดสูงสุดในบทสนทนาที่ต้องการแยกแยะ
   mic_input: อินพุตไมโครโฟน
   result_placeholder: ข้อความที่แปลงจากเสียงของคุณ
+  screen_audio: เสียงหน้าจอ
+  screen_audio_error: 'ข้อผิดพลาดเสียงหน้าจอ:'
+  screen_audio_notice: 'สำหรับ Windows: เลือกแท็บ "หน้าจอทั้งหมด" และเปิด "แชร์เสียงระบบด้วย"<br/>สำหรับ Mac: เลือก "Chrome Tab" และเปิด "Also share tab audio"<br/>Chrome และ Edge ใช้งานได้ Firefox ใช้งานไม่ได้'
   select_input_method: โปรดเลือกจากอินพุตไมโครโฟนหรืออัปโหลดไฟล์
   speaker_names: ชื่อผู้พูด (คั่นด้วยเครื่องหมายจุลภาค)
   speaker_recognition: การแยกแยะผู้พูด

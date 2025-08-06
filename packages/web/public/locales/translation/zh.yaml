@@ -457,6 +457,14 @@ meetingMinutes:
   generating: 正在生成会议纪要...
   generation_error: 会议纪要生成失败。请重试。
   generation_success: 会议纪要生成成功
+  language: 语言
+  language_auto: 自动检测
+  language_chinese: 中文
+  language_english: 英语
+  language_japanese: 日语
+  language_korean: 韩语
+  language_thai: 泰语
+  language_vietnamese: 越南语
   last_generated: 最后生成时间 {{time}}
   minutes_placeholder: 生成后会议纪要将显示在这里
   model: 模型
@@ -566,11 +574,17 @@ summarize:
   title: 摘要
 transcribe:
   detailed_parameters: 详细参数
+  direct_input: 直接输入
+  direct_input_instruction: 请在下方"转录文本"区域中直接输入会议记录的源文本
+  direct_input_placeholder: 请在此处输入会议记录的源文本...
   file_upload: 文件上传
   max_speakers: 最大发言人数
   max_speakers_help: 要识别的最大发言人数
   mic_input: 麦克风输入
   result_placeholder: 语音识别结果将显示在这里
+  screen_audio: 屏幕音频
+  screen_audio_error: 屏幕音频错误：
+  screen_audio_notice: 'Windows 的情况:选择「整个屏幕」选项卡，并启用「共享系统音频」。<br/>Mac 的情况:选择「Chrome Tab」，并启用「Also share tab audio」。<br/>Chrome 和 Edge 可以使用。Firefox 无法使用。'
   select_input_method: 请选择麦克风输入或文件上传
   speaker_names: 发言人姓名（逗号分隔）
   speaker_recognition: 说话人识别

@@ -15,6 +15,8 @@ chat:
   delete_link: リンクの削除
   delete_link_message: リンクを削除することで、会話履歴の公開を停止できます。
   drop_files: ファイルをドロップしてください
+  hint_cmd_enter: ⌘ + Enter で送信
+  hint_ctrl_enter: Ctrl + Enter で送信
   history: 会話履歴
   initialize: 初期化
   model_parameters: モデルパラメータ
@@ -523,11 +525,19 @@ meetingMinutes:
   frequency_1min: 1分ごと
   frequency_5min: 5分ごと
   generate: 生成
-  generate_minutes_header: 議事録生成
+  generate_minutes_header: 議事録を生成
   generated_minutes: 生成された議事録
   generating: 議事録生成中...
   generation_error: 議事録の生成に失敗しました。再試行してください。
   generation_success: 議事録が正常に生成されました
+  language: 言語
+  language_auto: 自動検出
+  language_chinese: 中国語
+  language_english: 英語
+  language_japanese: 日本語
+  language_korean: 韓国語
+  language_thai: タイ語
+  language_vietnamese: ベトナム語
   last_generated: 最後の生成時刻 {{time}}
   minutes_placeholder: 生成後にここに議事録が表示されます
   model: モデル
@@ -615,6 +625,7 @@ setting:
     agent_enabled: Agent 有効
     language: 言語設定
     language_help: 表示言語を変更できます
+    line_break_enter: Enter で改行
     login_status: ログイン状態
     rag_enabled: RAG (Amazon Kendra) 有効
     rag_kb_enabled: RAG (Knowledge Base) 有効
@@ -662,11 +673,17 @@ summarize:
   title: 要約
 transcribe:
   detailed_parameters: 詳細なパラメータ
+  direct_input: 直接入力
+  direct_input_instruction: 下の「文字起こし」エリアに議事録の元となるテキストを直接入力してください。
+  direct_input_placeholder: ここに議事録の元となるテキストを入力してください...
   file_upload: ファイルアップロード
   max_speakers: Max Speakers
   max_speakers_help: 認識する話者の最大数
   mic_input: マイク入力
   result_placeholder: 音声認識結果がここに表示されます
+  screen_audio: スクリーン音声
+  screen_audio_error: 'スクリーン音声エラー:'
+  screen_audio_notice: 'Windows の場合:「画面全体」タブより、「システム音声も共有する」を ON にしてください。<br/>Mac の場合:「Chrome Tab」から、「Also share tab audio」を ON にしてください。<br/>Chrome と Edge は動作します。Firefox は動作しません。'
   select_input_method: マイク入力 or ファイルアップロードから選択してください
   speaker_names: 話し手の名前（カンマ区切り）
   speaker_recognition: 話者認識

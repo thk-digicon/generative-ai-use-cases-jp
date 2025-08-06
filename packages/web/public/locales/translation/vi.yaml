@@ -15,6 +15,8 @@ chat:
   delete_link: Xóa liên kết
   delete_link_message: Bằng cách xóa liên kết, bạn có thể ngừng công khai lịch sử cuộc trò chuyện.
   drop_files: Vui lòng thả file
+  hint_cmd_enter: ⌘ + Enter để gửi
+  hint_ctrl_enter: Ctrl + Enter để gửi
   history: Lịch sử cuộc trò chuyện
   initialize: Khởi tạo
   model_parameters: Tham số mô hình
@@ -537,6 +539,41 @@ language:
   ko: Tiếng Hàn
   th: tiếng Thái
   zh: Tiếng Trung
+meetingMinutes:
+  auto_generate: Tự động tạo
+  custom_prompt: Lời nhắc tùy chỉnh
+  custom_prompt_placeholder: Nhập lời nhắc tùy chỉnh để tạo biên bản cuộc họp...
+  frequency: Tần suất tạo
+  frequency_10min: Mỗi 10 phút
+  frequency_1min: Mỗi phút
+  frequency_5min: Mỗi 5 phút
+  generate: Tạo
+  generate_minutes_header: Tạo biên bản
+  generated_minutes: Biên bản đã được tạo
+  generating: Đang tạo biên bản...
+  generation_error: Không thể tạo biên bản cuộc họp. Vui lòng thử lại.
+  generation_success: Tạo biên bản cuộc họp thành công
+  language: Ngôn ngữ
+  language_auto: Tự động phát hiện
+  language_chinese: Tiếng Trung
+  language_english: Tiếng Anh
+  language_japanese: Tiếng Nhật
+  language_korean: Tiếng Hàn
+  language_thai: Tiếng Thái
+  language_vietnamese: Tiếng Việt
+  last_generated: Tạo lần cuối {{time}}
+  minutes_placeholder: Biên bản sẽ xuất hiện ở đây sau khi tạo
+  model: Mô hình
+  next_generation_in: 'Tạo tiếp theo trong : '
+  record_transcribe: Ghi âm và chuyển đổi
+  speech_recognition: Nhận dạng giọng nói
+  style: Kiểu biên bản
+  style_custom: Tùy chỉnh
+  style_faq: FAQ
+  style_newspaper: Báo chí
+  style_transcription: Chuyển đổi
+  title: Trình tạo biên bản cuộc họp
+  transcript: Bản chuyển đổi
 model:
   parameters:
     reasoning: Reasoning
@@ -615,6 +652,7 @@ setting:
     agent_enabled: Agent được bật
     language: Cài đặt ngôn ngữ
     language_help: Có thể thay đổi ngôn ngữ hiển thị
+    line_break_enter: Nhấn Enter để xuống dòng
     login_status: Trạng thái đăng nhập
     rag_enabled: RAG (Amazon Kendra) được bật
     rag_kb_enabled: RAG (Knowledge Base) được bật
@@ -649,11 +687,17 @@ summarize:
   title: Tóm tắt
 transcribe:
   detailed_parameters: Tham số chi tiết
+  direct_input: Nhập trực tiếp
+  direct_input_instruction: Vui lòng nhập trực tiếp nội dung nguồn cho biên bản cuộc họp vào vùng "Bản chuyển đổi" bên dưới
+  direct_input_placeholder: Vui lòng nhập nội dung nguồn cho biên bản cuộc họp tại đây...
   file_upload: Tải lên tệp
   max_speakers: Max Speakers
   max_speakers_help: Số lượng người nói tối đa được nhận dạng
   mic_input: Đầu vào microphone
   result_placeholder: Kết quả nhận dạng giọng nói sẽ được hiển thị ở đây
+  screen_audio: Âm thanh màn hình
+  screen_audio_error: 'Lỗi âm thanh màn hình:'
+  screen_audio_notice: 'Đối với Windows: Chọn tab "Toàn bộ màn hình" và bật "Chia sẻ âm thanh hệ thống".<br/>Đối với Mac: Chọn "Chrome Tab" và bật "Also share tab audio".<br/>Chrome và Edge hoạt động. Firefox không hoạt động.'
   select_input_method: Vui lòng chọn từ đầu vào microphone hoặc tải lên tệp
   speaker_names: Tên người nói (phân cách bằng dấu phẩy)
   speaker_recognition: Nhận dạng người nói

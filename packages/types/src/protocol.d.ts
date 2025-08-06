@@ -169,6 +169,7 @@ export type StartTranscriptionRequest = {
   audioUrl: string;
   speakerLabel: boolean;
   maxSpeakers: number;
+  languageCode?: string;
 };
 
 export type StartTranscriptionResponse = {
