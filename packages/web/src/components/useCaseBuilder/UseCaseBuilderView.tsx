@@ -417,11 +417,11 @@ const UseCaseBuilderView: React.FC<Props> = (props) => {
 
   const accept = useMemo(() => {
     if (!modelId) return [];
-    const feature = MODELS.modelMetadata[modelId].flags;
+    const feature = MODELS.getModelMetadata(modelId);
     return [
-      ...(feature.doc ? fileLimit.accept.doc : []),
-      ...(feature.image ? fileLimit.accept.image : []),
-      ...(feature.video ? fileLimit.accept.video : []),
+      ...(feature.flags.doc ? fileLimit.accept.doc : []),
+      ...(feature.flags.image ? fileLimit.accept.image : []),
+      ...(feature.flags.video ? fileLimit.accept.video : []),
     ];
   }, [modelId]);
 
@@ -454,13 +454,18 @@ const UseCaseBuilderView: React.FC<Props> = (props) => {
   const handleDragOver = (event: React.DragEvent) => {
     // When a file is dragged, display the overlay
     event.preventDefault();
+    event.stopPropagation();
     setIsOver(true);
   };
 
   const handleDragLeave = (event: React.DragEvent) => {
     // When a file is dragged, hide the overlay
+    event.stopPropagation();
     event.preventDefault();
-    setIsOver(false);
+
+    if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+      setIsOver(false);
+    }
   };
 
   const handleDrop = (event: React.DragEvent) => {

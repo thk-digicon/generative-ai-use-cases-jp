@@ -1,6 +1,11 @@
 agent:
   drop_files: Drop files to upload
   title: Agent Chat
+agent_core:
+  model: Model
+  runtime: Runtime
+  start_conversation: Start a conversation with AgentCore
+  title: AgentCore
 auth:
   loading: Loading...
   login: Login
@@ -21,13 +26,12 @@ chat:
   hint_ctrl_enter: Ctrl + Enter to Submit
   history: Conversation History
   initialize: Initialize
-  model_parameters: Model Parameters
   open_link: Open Link
   prompt_examples: Prompt Examples
   save: Save
   saved_system_prompts: Saved System Prompts
   search_by_title: Search by title
-  settings: Settings
+  settings: Apply
   share: Share
   share_conversation: Share Conversation History
   sharing: Sharing
@@ -444,10 +448,16 @@ generateText:
   result_placeholder: Generated text will be displayed here
   source_info: Source information for text
   title: Text Generation
+inputs:
+  attachment: Attachment
+  reasoning: Extended thinking
+  setting: Setting
 landing:
   alert:
     description: >-
-      This is an environment used for internal demos by SA. When giving demos to customers, please use the one deployed in your own AWS account as a rule. Do not input customer data or use it for business purposes.
+      This is an environment used for internal demos by SA. When giving demos to
+      customers, please use the one deployed in your own AWS account as a rule.
+      Do not input customer data or use it for business purposes.
     title: About GenU Demo Environment
   demo:
     agent:
@@ -489,7 +499,8 @@ landing:
         music, photography, trendy smartphone, city background
     mcp:
       content: >-
-        Please research about Amazon Bedrock security. Is user input used for model training?
+        Please research about Amazon Bedrock security. Is user input used for
+        model training?
     rag:
       content: >-
         Please provide an overview of Amazon Nova Canvas and explain its key
@@ -533,6 +544,9 @@ landing:
         execute actions or reference the vector database of Knowledge Bases for
         Amazon Bedrock.
       title: Agent Chat
+    agent_core:
+      description: AgentCore Chat is a feature that utilizes various Agents created with Bedrock AgentCore.
+      title: AgentCore
     chat:
       description: >-
         You can have interactive dialogues with an LLM in a chat format. It can
@@ -566,12 +580,16 @@ landing:
       title: Image Generation
     mcp_chat:
       description: >-
-        MCP Chat is a chat function that seamlessly integrates Bedrock's LLM models with external data and external tools through the Model Context Protocol (MCP). You can freely add tools by editing the mcp.json file. Leveraging Strands Agents as an MCP agent.
+        MCP Chat is a chat function that seamlessly integrates Bedrock's LLM
+        models with external data and external tools through the Model Context
+        Protocol (MCP). You can freely add tools by editing the mcp.json file.
+        Leveraging Strands Agents as an MCP agent.
       title: MCP Chat
     meeting-minutes:
       description: >-
-        Automatically generate meeting minutes from audio recordings or real-time transcription.
-        No need to write prompts - choose from near-original transcription, newspaper style, or FAQ format.
+        Automatically generate meeting minutes from audio recordings or
+        real-time transcription. No need to write prompts - choose from
+        near-original transcription, newspaper style, or FAQ format.
       title: Meeting Minutes Generation
     rag_chat:
       description_kb: >-
@@ -706,8 +724,7 @@ meetingMinutes:
   transcript: Transcript
 model:
   parameters:
-    reasoning: Reasoning
-    reasoning_budget: Reasoning Budget
+    reasoning_budget: Token budget for extended thinking
 navigation:
   agentChat: Agent Chat
   chat: Chat
@@ -850,7 +867,9 @@ summarize:
 transcribe:
   detailed_parameters: Detailed parameters
   direct_input: Direct Input
-  direct_input_instruction: Please enter the source text for meeting minutes directly in the "Transcript" area below.
+  direct_input_instruction: >-
+    Please enter the source text for meeting minutes directly in the
+    "Transcript" area below.
   direct_input_placeholder: Please enter the source text for meeting minutes here...
   file_upload: File Upload
   max_speakers: Max Speakers
@@ -1268,11 +1287,6 @@ videoAnalyzer:
 voiceChat:
   close: Close session
   default_system_prompt: You are an AI assistant.
-  experimental_warning: >-
-    Voice Chat is still in an experimental stage. The architecture, etc. may be
-    changed in the future. Conversation history will not be saved. The supported
-    language is English only.
-  experimental_warning_title: About Voice Chat
   im_listening: I'm listening...
   start: Start new session
   title: Voice Chat

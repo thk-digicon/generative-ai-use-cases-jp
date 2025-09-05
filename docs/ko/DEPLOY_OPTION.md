@@ -499,6 +499,7 @@ Amazon Bedrock용 Knowledge Bases와 통합되는 에이전트를 수동으로 �
 먼저 [Amazon Bedrock용 Knowledge Bases 문서](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base-create.html)를 참조하여 [지식 베이스 AWS 콘솔](https://console.aws.amazon.com/bedrock/home?#/knowledge-bases)에서 지식 베이스를 생성합니다. `modelRegion`과 동일한 지역에 생성합니다.
 
 다음으로 [에이전트 AWS 콘솔](https://console.aws.amazon.com/bedrock/home?#/agents)에서 Agent를 수동으로 생성합니다. 설정은 대부분 기본값으로 유지하고, Agent 프롬프트에는 아래 예제를 참조하여 프롬프트를 입력합니다. 작업 그룹은 설정하지 않고 진행하여 이전 단계에서 생성한 지식 베이스를 등록하고 아래 예제를 참조하여 프롬프트를 입력합니다.
+
 ```
 Agent 프롬프트 예제: 당신은 지시에 응답하는 어시스턴트입니다. 지시에 따라 정보를 검색하고 내용을 바탕으로 적절히 응답하세요. 정보에 언급되지 않은 것에 대해서는 답변하지 마세요. 여러 번 검색할 수 있습니다.
 Knowledge Base 프롬프트 예제: 키워드로 검색하여 정보를 얻습니다. 연구, X에 대해 묻기, 요약과 같은 작업에 사용할 수 있습니다. 대화에서 검색 키워드를 추측하세요. 검색 결과에는 관련성이 낮은 내용이 포함될 수 있으므로 답변할 때는 관련성이 높은 내용만 참조하세요. 여러 번 실행할 수 있습니다.
@@ -699,6 +700,7 @@ const envs: Record<string, Partial<StackInput>> = {
 `videoGenerationModelIds`에 하나 이상의 모델을 정의하면 활성화됩니다.
 `videoGenerationModelIds`에 대해서는 [Amazon Bedrock 모델 변경](#change-amazon-bedrock-models)을 참조하세요.
 기본값은 [packages/cdk/lib/stack-input.ts](/packages/cdk/lib/stack-input.ts)를 참조하세요.
+
 ### Video Analysis 사용 사례 활성화
 
 비디오 분석 사용 사례에서는 비디오 이미지 프레임과 텍스트를 입력하여 LLM이 이미지 내용을 분석하도록 합니다.
@@ -1258,35 +1260,35 @@ const envs: Record<string, Partial<StackInput>> = {
   dev: {
     modelRegion: 'us-west-2',
     modelIds: [
-      "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
-      "us.anthropic.claude-3-5-haiku-20241022-v1:0",
-      "us.anthropic.claude-3-haiku-20240307-v1:0",
-      "us.deepseek.r1-v1:0",
-      "us.writer.palmyra-x5-v1:0",
-      "us.writer.palmyra-x4-v1:0",
-      "us.meta.llama4-maverick-17b-instruct-v1:0",
-      "us.meta.llama4-scout-17b-instruct-v1:0",
-      "us.meta.llama3-2-11b-instruct-v1:0",
-      "us.meta.llama3-2-3b-instruct-v1:0",
-      "us.meta.llama3-2-1b-instruct-v1:0",
-      "us.amazon.nova-premier-v1:0",
-      "us.amazon.nova-pro-v1:0",
-      "us.amazon.nova-lite-v1:0",
-      "us.amazon.nova-micro-v1:0",
-      "cohere.command-r-plus-v1:0",
-      "cohere.command-r-v1:0",
-      "mistral.mistral-large-2407-v1:0",
+      'us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+      'us.anthropic.claude-3-5-haiku-20241022-v1:0',
+      'us.anthropic.claude-3-haiku-20240307-v1:0',
+      'us.deepseek.r1-v1:0',
+      'us.writer.palmyra-x5-v1:0',
+      'us.writer.palmyra-x4-v1:0',
+      'us.meta.llama4-maverick-17b-instruct-v1:0',
+      'us.meta.llama4-scout-17b-instruct-v1:0',
+      'us.meta.llama3-2-11b-instruct-v1:0',
+      'us.meta.llama3-2-3b-instruct-v1:0',
+      'us.meta.llama3-2-1b-instruct-v1:0',
+      'us.amazon.nova-premier-v1:0',
+      'us.amazon.nova-pro-v1:0',
+      'us.amazon.nova-lite-v1:0',
+      'us.amazon.nova-micro-v1:0',
+      'cohere.command-r-plus-v1:0',
+      'cohere.command-r-v1:0',
+      'mistral.mistral-large-2407-v1:0',
     ],
     imageGenerationModelIds: [
-      "amazon.titan-image-generator-v2:0",
-      "amazon.titan-image-generator-v1",
-      "stability.sd3-large-v1:0",
-      "stability.sd3-5-large-v1:0",
-      "stability.stable-image-core-v1:0",
-      "stability.stable-image-core-v1:1",
-      "stability.stable-image-ultra-v1:0",
-      "stability.stable-image-ultra-v1:1",
-      "stability.stable-diffusion-xl-v1",
+      'amazon.titan-image-generator-v2:0',
+      'amazon.titan-image-generator-v1',
+      'stability.sd3-large-v1:0',
+      'stability.sd3-5-large-v1:0',
+      'stability.stable-image-core-v1:0',
+      'stability.stable-image-core-v1:1',
+      'stability.stable-image-ultra-v1:0',
+      'stability.stable-image-ultra-v1:1',
+      'stability.stable-diffusion-xl-v1',
     ],
   },
 };
@@ -1391,7 +1393,7 @@ SageMaker JumpStart는 패키지된 오픈 소스 대화형 언어 모델의 원
 
 [AWS와 Hugging Face의 파트너십](https://aws.amazon.com/jp/blogs/news/aws-and-hugging-face-collaborate-to-make-generative-ai-more-accessible-and-cost-efficient/) 덕분에 SageMaker SDK를 사용하여 Hugging Face의 모델 ID를 지정하기만 하면 모델을 배포할 수 있습니다.
 
-모델의 Hugging Face 페이지에서 _Deploy_ > _Amazon SageMaker_를 선택하면 모델 배포를 위한 코드를 볼 수 있습니다. 이 코드를 복사하여 실행하면 모델이 배포됩니다. (모델에 따라 인스턴스 크기나 `SM_NUM_GPUS`와 같은 매개변수를 조정해야 할 수 있습니다. 배포가 실패하면 CloudWatch Logs에서 로그를 확인할 수 있습니다.)
+모델의 Hugging Face 페이지에서 _Deploy_ > *Amazon SageMaker*를 선택하면 모델 배포를 위한 코드를 볼 수 있습니다. 이 코드를 복사하여 실행하면 모델이 배포됩니다. (모델에 따라 인스턴스 크기나 `SM_NUM_GPUS`와 같은 매개변수를 조정해야 할 수 있습니다. 배포가 실패하면 CloudWatch Logs에서 로그를 확인할 수 있습니다.)
 
 > [!NOTE]
 > 배포할 때 한 가지 수정이 필요합니다: 엔드포인트 이름이 GenU 애플리케이션에 표시되고 모델의 프롬프트 템플릿을 결정하는 데 사용됩니다(다음 섹션에서 설명). 따라서 구별 가능한 엔드포인트 이름을 지정해야 합니다.
@@ -1497,6 +1499,7 @@ const envs: Record<string, Partial<StackInput>> = {
 이는 Cognito에 이미 생성된 사용자에게는 영향을 주지 않습니다. 가입하거나 생성하려는 새 사용자에게만 적용됩니다.
 
 구성 예제
+
 - `amazon.com` 도메인의 이메일 주소로만 가입을 허용하는 예제
 
 **[parameter.ts](/packages/cdk/parameter.ts) 편집**
@@ -1697,6 +1700,7 @@ GenerativeAiUseCasesDashboardStack에서 생성된 Kendra 인덱스를 미리 �
 아래 예제는 JST 월-금 오전 8시에 인덱스 생성을 시작하고 JST 월-금 오후 8시에 삭제를 시작하도록 구성합니다.
 
 **[parameter.ts](/packages/cdk/parameter.ts) 편집**
+
 ```typescript
 // parameter.ts
 const envs: Record<string, Partial<StackInput>> = {

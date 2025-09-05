@@ -19,7 +19,6 @@ chat:
   hint_ctrl_enter: Ctrl + Enter เพื่อส่ง
   history: ประวัติการสนทนา
   initialize: เริ่มต้นใหม่
-  model_parameters: พารามิเตอร์โมเดล
   open_link: เปิดลิงก์
   prompt_examples: ตัวอย่าง prompt
   save: บันทึก
@@ -606,7 +605,6 @@ meetingMinutes:
   transcript: บันทึกการถอดความ
 model:
   parameters:
-    reasoning: การให้เหตุผล
     reasoning_budget: งบประมาณการให้เหตุผล
 navigation:
   agentChat: Agent Chat
@@ -1081,9 +1079,6 @@ videoAnalyzer:
 voiceChat:
   close: ปิดเซสชั่น
   default_system_prompt: You are an AI assistant.
-  experimental_warning: >-
-    Voice Chat ยังอยู่ในระยะทดลอง สถาปัตยกรรมและอื่นๆ อาจมีการเปลี่ยนแปลงในอนาคต ประวัติการสนทนาจะไม่ได้รับการบันทึก ภาษาที่รองรับคือภาษาอังกฤษเท่านั้น
-  experimental_warning_title: เกี่ยวกับ Voice Chat
   im_listening: กำลังฟัง...
   start: เริ่มเซสชันใหม่
   title: Voice Chat
